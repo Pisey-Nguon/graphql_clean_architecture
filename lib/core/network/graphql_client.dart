@@ -1,3 +1,4 @@
+import 'package:graphql_clean_architecture/core/config/app_endpoint.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:injectable/injectable.dart';
 
@@ -12,7 +13,7 @@ class GraphQLClientService {
   void _initializeClient() {
     final httpLink = HttpLink(
       // Replace with your GraphQL endpoint
-      'https://rickandmortyapi.com/graphql',
+      AppEndpoint.getEndpoint(),
     );
 
     final authLink = AuthLink(
