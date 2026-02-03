@@ -1,5 +1,10 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import '../../domain/entities/episode.dart';
 
+part 'episode_model.g.dart';
+
+@JsonSerializable()
 class EpisodeModel extends Episode {
   const EpisodeModel({
     required super.id,
@@ -8,21 +13,7 @@ class EpisodeModel extends Episode {
     required super.episode,
   });
 
-  factory EpisodeModel.fromJson(Map<String, dynamic> json) {
-    return EpisodeModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      airDate: json['air_date'] as String,
-      episode: json['episode'] as String,
-    );
-  }
+  factory EpisodeModel.fromJson(Map<String, dynamic> json) => _$EpisodeModelFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'air_date': airDate,
-      'episode': episode,
-    };
-  }
+  Map<String, dynamic> toJson() => _$EpisodeModelToJson(this);
 }
