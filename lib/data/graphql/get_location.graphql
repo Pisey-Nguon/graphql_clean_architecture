@@ -1,0 +1,8 @@
+query GetLocation($id: ID!) {
+  location(id: $id) {
+    id
+    name
+    type
+    dimension
+  }
+}
