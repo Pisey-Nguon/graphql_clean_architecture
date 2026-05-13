@@ -1,0 +1,6 @@
+schema: https://rickandmortyapi.com/graphql
+documents: lib/data/graphql/**.graphql
+generates:
+  lib/data/graphql/schema.graphql:
+    plugins:
+      - schema_ast

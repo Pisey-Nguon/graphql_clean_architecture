@@ -268,6 +268,44 @@ const documentNodeQueryGetEpisode = DocumentNode(
                   selectionSet: null,
                 ),
                 FieldNode(
+                  name: NameNode(value: 'characters'),
+                  alias: null,
+                  arguments: [],
+                  directives: [],
+                  selectionSet: SelectionSetNode(
+                    selections: [
+                      FieldNode(
+                        name: NameNode(value: 'id'),
+                        alias: null,
+                        arguments: [],
+                        directives: [],
+                        selectionSet: null,
+                      ),
+                      FieldNode(
+                        name: NameNode(value: 'name'),
+                        alias: null,
+                        arguments: [],
+                        directives: [],
+                        selectionSet: null,
+                      ),
+                      FieldNode(
+                        name: NameNode(value: 'image'),
+                        alias: null,
+                        arguments: [],
+                        directives: [],
+                        selectionSet: null,
+                      ),
+                      FieldNode(
+                        name: NameNode(value: '__typename'),
+                        alias: null,
+                        arguments: [],
+                        directives: [],
+                        selectionSet: null,
+                      ),
+                    ],
+                  ),
+                ),
+                FieldNode(
                   name: NameNode(value: '__typename'),
                   alias: null,
                   arguments: [],
@@ -296,6 +334,7 @@ class Query$GetEpisode$episode {
     required this.name,
     required this.air_date,
     required this.episode,
+    this.characters,
     this.$__typename = 'Episode',
   });
 
@@ -304,12 +343,22 @@ class Query$GetEpisode$episode {
     final l$name = json['name'];
     final l$air_date = json['air_date'];
     final l$episode = json['episode'];
+    final l$characters = json['characters'];
     final l$$__typename = json['__typename'];
     return Query$GetEpisode$episode(
       id: (l$id as String),
       name: (l$name as String),
       air_date: (l$air_date as String),
       episode: (l$episode as String),
+      characters: (l$characters as List<dynamic>?)
+          ?.map(
+            (e) => e == null
+                ? null
+                : Query$GetEpisode$episode$characters.fromJson(
+                    (e as Map<String, dynamic>),
+                  ),
+          )
+          .toList(),
       $__typename: (l$$__typename as String),
     );
   }
@@ -321,6 +370,8 @@ class Query$GetEpisode$episode {
   final String air_date;
 
   final String episode;
+
+  final List<Query$GetEpisode$episode$characters?>? characters;
 
   final String $__typename;
 
@@ -334,6 +385,8 @@ class Query$GetEpisode$episode {
     _resultData['air_date'] = l$air_date;
     final l$episode = episode;
     _resultData['episode'] = l$episode;
+    final l$characters = characters;
+    _resultData['characters'] = l$characters?.map((e) => e?.toJson()).toList();
     final l$$__typename = $__typename;
     _resultData['__typename'] = l$$__typename;
     return _resultData;
@@ -345,8 +398,16 @@ class Query$GetEpisode$episode {
     final l$name = name;
     final l$air_date = air_date;
     final l$episode = episode;
+    final l$characters = characters;
     final l$$__typename = $__typename;
-    return Object.hashAll([l$id, l$name, l$air_date, l$episode, l$$__typename]);
+    return Object.hashAll([
+      l$id,
+      l$name,
+      l$air_date,
+      l$episode,
+      l$characters == null ? null : Object.hashAll(l$characters.map((v) => v)),
+      l$$__typename,
+    ]);
   }
 
   @override
@@ -378,6 +439,22 @@ class Query$GetEpisode$episode {
     if (l$episode != lOther$episode) {
       return false;
     }
+    final l$characters = characters;
+    final lOther$characters = other.characters;
+    if (l$characters != null && lOther$characters != null) {
+      if (l$characters.length != lOther$characters.length) {
+        return false;
+      }
+      for (int i = 0; i < l$characters.length; i++) {
+        final l$characters$entry = l$characters[i];
+        final lOther$characters$entry = lOther$characters[i];
+        if (l$characters$entry != lOther$characters$entry) {
+          return false;
+        }
+      }
+    } else if (l$characters != lOther$characters) {
+      return false;
+    }
     final l$$__typename = $__typename;
     final lOther$$__typename = other.$__typename;
     if (l$$__typename != lOther$$__typename) {
@@ -407,8 +484,19 @@ abstract class CopyWith$Query$GetEpisode$episode<TRes> {
     String? name,
     String? air_date,
     String? episode,
+    List<Query$GetEpisode$episode$characters?>? characters,
     String? $__typename,
   });
+  TRes characters(
+    Iterable<Query$GetEpisode$episode$characters?>? Function(
+      Iterable<
+        CopyWith$Query$GetEpisode$episode$characters<
+          Query$GetEpisode$episode$characters
+        >?
+      >?,
+    )
+    _fn,
+  );
 }
 
 class _CopyWithImpl$Query$GetEpisode$episode<TRes>
@@ -426,6 +514,7 @@ class _CopyWithImpl$Query$GetEpisode$episode<TRes>
     Object? name = _undefined,
     Object? air_date = _undefined,
     Object? episode = _undefined,
+    Object? characters = _undefined,
     Object? $__typename = _undefined,
   }) => _then(
     Query$GetEpisode$episode(
@@ -439,10 +528,32 @@ class _CopyWithImpl$Query$GetEpisode$episode<TRes>
       episode: episode == _undefined || episode == null
           ? _instance.episode
           : (episode as String),
+      characters: characters == _undefined
+          ? _instance.characters
+          : (characters as List<Query$GetEpisode$episode$characters?>?),
       $__typename: $__typename == _undefined || $__typename == null
           ? _instance.$__typename
           : ($__typename as String),
     ),
+  );
+
+  TRes characters(
+    Iterable<Query$GetEpisode$episode$characters?>? Function(
+      Iterable<
+        CopyWith$Query$GetEpisode$episode$characters<
+          Query$GetEpisode$episode$characters
+        >?
+      >?,
+    )
+    _fn,
+  ) => call(
+    characters: _fn(
+      _instance.characters?.map(
+        (e) => e == null
+            ? null
+            : CopyWith$Query$GetEpisode$episode$characters(e, (i) => i),
+      ),
+    )?.toList(),
   );
 }
 
@@ -457,6 +568,155 @@ class _CopyWithStubImpl$Query$GetEpisode$episode<TRes>
     String? name,
     String? air_date,
     String? episode,
+    List<Query$GetEpisode$episode$characters?>? characters,
     String? $__typename,
   }) => _res;
+
+  characters(_fn) => _res;
+}
+
+class Query$GetEpisode$episode$characters {
+  Query$GetEpisode$episode$characters({
+    required this.id,
+    required this.name,
+    required this.image,
+    this.$__typename = 'Character',
+  });
+
+  factory Query$GetEpisode$episode$characters.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    final l$id = json['id'];
+    final l$name = json['name'];
+    final l$image = json['image'];
+    final l$$__typename = json['__typename'];
+    return Query$GetEpisode$episode$characters(
+      id: (l$id as String),
+      name: (l$name as String),
+      image: (l$image as String),
+      $__typename: (l$$__typename as String),
+    );
+  }
+
+  final String id;
+
+  final String name;
+
+  final String image;
+
+  final String $__typename;
+
+  Map<String, dynamic> toJson() {
+    final _resultData = <String, dynamic>{};
+    final l$id = id;
+    _resultData['id'] = l$id;
+    final l$name = name;
+    _resultData['name'] = l$name;
+    final l$image = image;
+    _resultData['image'] = l$image;
+    final l$$__typename = $__typename;
+    _resultData['__typename'] = l$$__typename;
+    return _resultData;
+  }
+
+  @override
+  int get hashCode {
+    final l$id = id;
+    final l$name = name;
+    final l$image = image;
+    final l$$__typename = $__typename;
+    return Object.hashAll([l$id, l$name, l$image, l$$__typename]);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other is! Query$GetEpisode$episode$characters ||
+        runtimeType != other.runtimeType) {
+      return false;
+    }
+    final l$id = id;
+    final lOther$id = other.id;
+    if (l$id != lOther$id) {
+      return false;
+    }
+    final l$name = name;
+    final lOther$name = other.name;
+    if (l$name != lOther$name) {
+      return false;
+    }
+    final l$image = image;
+    final lOther$image = other.image;
+    if (l$image != lOther$image) {
+      return false;
+    }
+    final l$$__typename = $__typename;
+    final lOther$$__typename = other.$__typename;
+    if (l$$__typename != lOther$$__typename) {
+      return false;
+    }
+    return true;
+  }
+}
+
+extension UtilityExtension$Query$GetEpisode$episode$characters
+    on Query$GetEpisode$episode$characters {
+  CopyWith$Query$GetEpisode$episode$characters<
+    Query$GetEpisode$episode$characters
+  >
+  get copyWith => CopyWith$Query$GetEpisode$episode$characters(this, (i) => i);
+}
+
+abstract class CopyWith$Query$GetEpisode$episode$characters<TRes> {
+  factory CopyWith$Query$GetEpisode$episode$characters(
+    Query$GetEpisode$episode$characters instance,
+    TRes Function(Query$GetEpisode$episode$characters) then,
+  ) = _CopyWithImpl$Query$GetEpisode$episode$characters;
+
+  factory CopyWith$Query$GetEpisode$episode$characters.stub(TRes res) =
+      _CopyWithStubImpl$Query$GetEpisode$episode$characters;
+
+  TRes call({String? id, String? name, String? image, String? $__typename});
+}
+
+class _CopyWithImpl$Query$GetEpisode$episode$characters<TRes>
+    implements CopyWith$Query$GetEpisode$episode$characters<TRes> {
+  _CopyWithImpl$Query$GetEpisode$episode$characters(this._instance, this._then);
+
+  final Query$GetEpisode$episode$characters _instance;
+
+  final TRes Function(Query$GetEpisode$episode$characters) _then;
+
+  static const _undefined = <dynamic, dynamic>{};
+
+  TRes call({
+    Object? id = _undefined,
+    Object? name = _undefined,
+    Object? image = _undefined,
+    Object? $__typename = _undefined,
+  }) => _then(
+    Query$GetEpisode$episode$characters(
+      id: id == _undefined || id == null ? _instance.id : (id as String),
+      name: name == _undefined || name == null
+          ? _instance.name
+          : (name as String),
+      image: image == _undefined || image == null
+          ? _instance.image
+          : (image as String),
+      $__typename: $__typename == _undefined || $__typename == null
+          ? _instance.$__typename
+          : ($__typename as String),
+    ),
+  );
+}
+
+class _CopyWithStubImpl$Query$GetEpisode$episode$characters<TRes>
+    implements CopyWith$Query$GetEpisode$episode$characters<TRes> {
+  _CopyWithStubImpl$Query$GetEpisode$episode$characters(this._res);
+
+  TRes _res;
+
+  call({String? id, String? name, String? image, String? $__typename}) => _res;
 }

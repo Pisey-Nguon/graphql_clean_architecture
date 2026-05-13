@@ -4,5 +4,10 @@ query GetEpisode($id: ID!) {
     name
     air_date
     episode
+      characters {
+        id
+        name
+        image
+      }    
   }
 }

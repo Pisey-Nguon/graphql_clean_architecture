@@ -8,11 +8,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return MaterialApp(
       title: 'Clean Architecture + GraphQL Demo',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      routerConfig: AppRouter.router,
+      initialRoute: AppRoutes.dashboard,
+      onGenerateRoute: AppRouter.onGenerateRoute,
     );
   }
 }

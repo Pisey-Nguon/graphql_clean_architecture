@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/di/injection_container.dart';
+import '../../core/navigation/app_router.dart';
+import '../../domain/entities/episode.dart';
 import '../bloc/episode_bloc.dart';
 import '../bloc/episode_event.dart';
 import '../bloc/episode_state.dart';
@@ -83,6 +85,36 @@ class EpisodeDetailPage extends StatelessWidget {
                             value: '#${episode.id}',
                             color: Colors.purple,
                           ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Characters (${episode.characters.length})',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          if (episode.characters.isEmpty)
+                            const Text(
+                              'No characters found for this episode.',
+                              style: TextStyle(color: Colors.black54),
+                            )
+                          else
+                            SizedBox(
+                              height: 150,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: episode.characters.length,
+                                separatorBuilder: (_, _) =>
+                                    const SizedBox(width: 12),
+                                itemBuilder: (context, index) {
+                                  final character = episode.characters[index];
+                                  return _EpisodeCharacterCard(
+                                    character: character,
+                                  );
+                                },
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -160,6 +192,56 @@ class _InfoCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _EpisodeCharacterCard extends StatelessWidget {
+  final EpisodeCharacter character;
+
+  const _EpisodeCharacterCard({required this.character});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 120,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          context.pushCharacterDetail(characterId: character.id);
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                character.image,
+                height: 100,
+                width: 120,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 100,
+                    width: 120,
+                    color: Colors.grey[300],
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.person, size: 30),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              character.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
       ),
     );
   }

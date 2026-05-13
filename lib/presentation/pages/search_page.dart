@@ -234,8 +234,9 @@ class _SearchResultCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: InkWell(
         onTap: () {
-          context.goCharacterDetail(
-            args: CharacterDetailRouteArgs(characterId: character.id),
+          context.pushCharacterDetail(
+            characterId: character.id,
+            character: character,
           );
         },
         child: Padding(

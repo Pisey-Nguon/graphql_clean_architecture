@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../domain/entities/character.dart';
 import '../../presentation/pages/character_detail_page.dart';
 import '../../presentation/pages/character_list_page.dart';
 import '../../presentation/pages/dashboard_page.dart';
@@ -14,19 +14,23 @@ import '../../presentation/pages/settings_page.dart';
 abstract class AppRoutes {
   static const dashboard = '/';
   static const characters = '/characters';
-  static const characterDetail = 'detail';
+  static const characterDetail = '/characters/detail';
   static const episodes = '/episodes';
-  static const episodeDetail = 'detail';
+  static const episodeDetail = '/episodes/detail';
   static const locations = '/locations';
-  static const locationDetail = 'detail';
+  static const locationDetail = '/locations/detail';
   static const search = '/search';
   static const settings = '/settings';
 }
 
-/// Strongly-typed argument classes (if you want to expand them to hold objects)
 class CharacterDetailRouteArgs {
-  const CharacterDetailRouteArgs({required this.characterId});
+  const CharacterDetailRouteArgs({
+    required this.characterId,
+    this.initialCharacter,
+  });
+
   final String characterId;
+  final Character? initialCharacter;
 }
 
 class EpisodeDetailRouteArgs {
@@ -42,64 +46,71 @@ class LocationDetailRouteArgs {
 class AppRouter {
   const AppRouter._();
 
-  static final GoRouter router = GoRouter(
-    initialLocation: AppRoutes.dashboard,
-    errorBuilder: (context, state) =>
-        _errorWidget(state.error?.toString() ?? 'Unknown Navigation Error'),
-    routes: [
-      GoRoute(
-        path: AppRoutes.dashboard,
-        builder: (context, state) => const DashboardPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.characters,
-        builder: (context, state) => const CharacterListPage(),
-        routes: [
-          GoRoute(
-            path: AppRoutes.characterDetail,
-            builder: (context, state) {
-              final args = state.extra as CharacterDetailRouteArgs;
-              return CharacterDetailPage(characterId: args.characterId);
-            },
+  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case AppRoutes.dashboard:
+        return _buildRoute(settings, (_) => const DashboardPage());
+      case AppRoutes.characters:
+        return _buildRoute(settings, (_) => const CharacterListPage());
+      case AppRoutes.characterDetail:
+        final args = settings.arguments;
+        if (args is! CharacterDetailRouteArgs) {
+          return _errorRoute(settings, 'Missing character detail arguments');
+        }
+        return _buildRoute(
+          settings,
+          (_) => CharacterDetailPage(
+            characterId: args.characterId,
+            initialCharacter: args.initialCharacter,
           ),
-        ],
-      ),
-      GoRoute(
-        path: AppRoutes.episodes,
-        builder: (context, state) => const EpisodeListPage(),
-        routes: [
-          GoRoute(
-            path: AppRoutes.episodeDetail,
-            builder: (context, state) {
-              final args = state.extra as EpisodeDetailRouteArgs;
-              return EpisodeDetailPage(episodeId: args.episodeId);
-            },
-          ),
-        ],
-      ),
-      GoRoute(
-        path: AppRoutes.locations,
-        builder: (context, state) => const LocationListPage(),
-        routes: [
-          GoRoute(
-            path: AppRoutes.locationDetail,
-            builder: (context, state) {
-              final args = state.extra as LocationDetailRouteArgs;
-              return LocationDetailPage(locationId: args.locationId);
-            },
-          ),
-        ],
-      ),
-      GoRoute(
-        path: AppRoutes.search,
-        builder: (context, state) => const SearchPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.settings,
-        builder: (context, state) => const SettingsPage(),
-      ),
-    ],
-  );
+        );
+      case AppRoutes.episodes:
+        return _buildRoute(settings, (_) => const EpisodeListPage());
+      case AppRoutes.episodeDetail:
+        final args = settings.arguments;
+        if (args is! EpisodeDetailRouteArgs) {
+          return _errorRoute(settings, 'Missing episode detail arguments');
+        }
+        return _buildRoute(
+          settings,
+          (_) => EpisodeDetailPage(episodeId: args.episodeId),
+        );
+      case AppRoutes.locations:
+        return _buildRoute(settings, (_) => const LocationListPage());
+      case AppRoutes.locationDetail:
+        final args = settings.arguments;
+        if (args is! LocationDetailRouteArgs) {
+          return _errorRoute(settings, 'Missing location detail arguments');
+        }
+        return _buildRoute(
+          settings,
+          (_) => LocationDetailPage(locationId: args.locationId),
+        );
+      case AppRoutes.search:
+        return _buildRoute(settings, (_) => const SearchPage());
+      case AppRoutes.settings:
+        return _buildRoute(settings, (_) => const SettingsPage());
+      default:
+        return _errorRoute(
+          settings,
+          'Unknown route: ${settings.name ?? 'null'}',
+        );
+    }
+  }
+
+  static Route<dynamic> _buildRoute(
+    RouteSettings settings,
+    WidgetBuilder builder,
+  ) {
+    return MaterialPageRoute(builder: builder, settings: settings);
+  }
+
+  static Route<dynamic> _errorRoute(RouteSettings settings, String message) {
+    return MaterialPageRoute(
+      settings: settings,
+      builder: (_) => _errorWidget(message),
+    );
+  }
 
   static Widget _errorWidget(String message) {
     return Scaffold(
@@ -115,35 +126,54 @@ class AppRouter {
 }
 
 /// Extension for type-safe route navigation.
-/// Instead of writing `context.go(...)` and passing strings/objects manually,
+/// Instead of writing `Navigator.of(context).pushNamed(...)` and building
+/// route arguments manually,
 /// you can now use this extension method safely:
 ///
 /// ```dart
-/// context.goCharacterDetail(args: const CharacterDetailRouteArgs(characterId: '1'));
+/// context.pushCharacterDetail(characterId: '1', character: character);
 /// ```
 extension AppRouterExtension on BuildContext {
   // --- Characters ---
-  void goCharacters() => go(AppRoutes.characters);
+  Future<T?> pushCharacters<T extends Object?>() =>
+      Navigator.of(this).pushNamed<T>(AppRoutes.characters);
 
-  void goCharacterDetail({required CharacterDetailRouteArgs args}) {
-    go('${AppRoutes.characters}/${AppRoutes.characterDetail}', extra: args);
-  }
+  Future<T?> pushCharacterDetail<T extends Object?>({
+    required String characterId,
+    Character? character,
+  }) => Navigator.of(this).pushNamed<T>(
+    AppRoutes.characterDetail,
+    arguments: CharacterDetailRouteArgs(
+      characterId: characterId,
+      initialCharacter: character,
+    ),
+  );
 
   // --- Episodes ---
-  void goEpisodes() => go(AppRoutes.episodes);
+  Future<T?> pushEpisodes<T extends Object?>() =>
+      Navigator.of(this).pushNamed<T>(AppRoutes.episodes);
 
-  void goEpisodeDetail({required EpisodeDetailRouteArgs args}) {
-    go('${AppRoutes.episodes}/${AppRoutes.episodeDetail}', extra: args);
-  }
+  Future<T?> pushEpisodeDetail<T extends Object?>({
+    required String episodeId,
+  }) => Navigator.of(this).pushNamed<T>(
+    AppRoutes.episodeDetail,
+    arguments: EpisodeDetailRouteArgs(episodeId: episodeId),
+  );
 
   // --- Locations ---
-  void goLocations() => go(AppRoutes.locations);
+  Future<T?> pushLocations<T extends Object?>() =>
+      Navigator.of(this).pushNamed<T>(AppRoutes.locations);
 
-  void goLocationDetail({required LocationDetailRouteArgs args}) {
-    go('${AppRoutes.locations}/${AppRoutes.locationDetail}', extra: args);
-  }
+  Future<T?> pushLocationDetail<T extends Object?>({
+    required String locationId,
+  }) => Navigator.of(this).pushNamed<T>(
+    AppRoutes.locationDetail,
+    arguments: LocationDetailRouteArgs(locationId: locationId),
+  );
 
   // --- Others ---
-  void goSearch() => go(AppRoutes.search);
-  void goSettings() => go(AppRoutes.settings);
+  Future<T?> pushSearch<T extends Object?>() =>
+      Navigator.of(this).pushNamed<T>(AppRoutes.search);
+  Future<T?> pushSettings<T extends Object?>() =>
+      Navigator.of(this).pushNamed<T>(AppRoutes.settings);
 }

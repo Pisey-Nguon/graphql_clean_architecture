@@ -8,11 +8,20 @@ import '../widgets/app_state_views.dart';
 
 class CharacterDetailPage extends StatelessWidget {
   final String characterId;
+  final Character? initialCharacter;
 
-  const CharacterDetailPage({super.key, required this.characterId});
+  const CharacterDetailPage({
+    super.key,
+    required this.characterId,
+    this.initialCharacter,
+  });
 
   @override
   Widget build(BuildContext context) {
+    if (initialCharacter != null) {
+      return Scaffold(body: _CharacterDetailScaffold(character: initialCharacter!));
+    }
+
     return BlocProvider(
       create: (_) =>
           getIt<CharacterBloc>()..add(GetCharacterEvent(id: characterId)),
@@ -24,88 +33,7 @@ class CharacterDetailPage extends StatelessWidget {
                 message: 'Loading character details...',
               );
             } else if (state is CharacterLoaded) {
-              final character = state.character;
-              return CustomScrollView(
-                slivers: [
-                  SliverAppBar(
-                    expandedHeight: 300,
-                    pinned: true,
-                    flexibleSpace: FlexibleSpaceBar(
-                      title: Text(
-                        character.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                              offset: Offset(0, 1),
-                              blurRadius: 3.0,
-                              color: Colors.black45,
-                            ),
-                          ],
-                        ),
-                      ),
-                      background: Hero(
-                        tag: 'character-${character.id}',
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Image.network(
-                              character.image,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: Colors.grey[300],
-                                  child: const Icon(Icons.person, size: 80),
-                                );
-                              },
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.black.withValues(alpha: 0.7),
-                                  ],
-                                  stops: const [0.6, 1.0],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.favorite_border),
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Added to favorites!'),
-                              duration: Duration(seconds: 1),
-                            ),
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.share),
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Share ${character.name}'),
-                              duration: const Duration(seconds: 1),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  SliverToBoxAdapter(
-                    child: CharacterDetailContent(character: character),
-                  ),
-                ],
-              );
+              return _CharacterDetailScaffold(character: state.character);
             } else if (state is CharacterError) {
               return AppErrorView(
                 message: state.message,
@@ -122,6 +50,95 @@ class CharacterDetailPage extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+}
+
+class _CharacterDetailScaffold extends StatelessWidget {
+  final Character character;
+
+  const _CharacterDetailScaffold({required this.character});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          expandedHeight: 300,
+          pinned: true,
+          flexibleSpace: FlexibleSpaceBar(
+            title: Text(
+              character.name,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(
+                    offset: Offset(0, 1),
+                    blurRadius: 3.0,
+                    color: Colors.black45,
+                  ),
+                ],
+              ),
+            ),
+            background: Hero(
+              tag: 'character-${character.id}',
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.network(
+                    character.image,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.person, size: 80),
+                      );
+                    },
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.7),
+                        ],
+                        stops: const [0.6, 1.0],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.favorite_border),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Added to favorites!'),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.share),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Share ${character.name}'),
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        SliverToBoxAdapter(child: CharacterDetailContent(character: character)),
+      ],
     );
   }
 }

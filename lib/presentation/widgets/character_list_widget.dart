@@ -63,8 +63,9 @@ class CharacterCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () {
-          context.goCharacterDetail(
-            args: CharacterDetailRouteArgs(characterId: character.id),
+          context.pushCharacterDetail(
+            characterId: character.id,
+            character: character,
           );
         },
         child: Padding(

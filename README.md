@@ -113,7 +113,11 @@ flutter test
 dart format lib test
 dart run build_runner build --delete-conflicting-outputs
 ```
-
+### To get latest update of schema.graphql
+```bash
+graphql get-schema https://rickandmortyapi.com/graphql -o lib/data/graphql/schema.graphql
+dart run build_runner build --delete-conflicting-outputs
+```
 ### Optional Auth Token
 
 This sample uses the public Rick and Morty GraphQL API and does not need auth.

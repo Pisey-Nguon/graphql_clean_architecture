@@ -65,11 +65,7 @@ class LocationListPage extends StatelessWidget {
                         ),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () {
-                          context.goLocationDetail(
-                            args: LocationDetailRouteArgs(
-                              locationId: location.id,
-                            ),
-                          );
+                          context.pushLocationDetail(locationId: location.id);
                         },
                       ),
                     );

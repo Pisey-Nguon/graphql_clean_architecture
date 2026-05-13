@@ -65,9 +65,7 @@ class EpisodeListPage extends StatelessWidget {
                         ),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () {
-                          context.goEpisodeDetail(
-                            args: EpisodeDetailRouteArgs(episodeId: episode.id),
-                          );
+                          context.pushEpisodeDetail(episodeId: episode.id);
                         },
                       ),
                     );
