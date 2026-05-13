@@ -1,13 +1,14 @@
 import 'package:injectable/injectable.dart';
 import '../../core/error/exceptions.dart';
 import '../../core/network/graphql_client.dart';
+import '../../domain/entities/location.dart';
 import '../graphql/__generated__/get_location.graphql.dart';
 import '../graphql/__generated__/get_locations.graphql.dart';
-import '../models/location_model.dart';
+import '../mappers/location_mapper.dart';
 
 abstract class LocationRemoteDataSource {
-  Future<List<LocationModel>> getLocations({required int page});
-  Future<LocationModel> getLocation({required String id});
+  Future<List<Location>> getLocations({required int page});
+  Future<Location> getLocation({required String id});
 }
 
 @LazySingleton(as: LocationRemoteDataSource)
@@ -17,7 +18,7 @@ class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
   LocationRemoteDataSourceImpl(this.graphQLClient);
 
   @override
-  Future<List<LocationModel>> getLocations({required int page}) async {
+  Future<List<Location>> getLocations({required int page}) async {
     try {
       final result = await graphQLClient.client.query$GetLocations(
         Options$Query$GetLocations(
@@ -36,14 +37,7 @@ class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
 
       return locations
           .where((location) => location != null)
-          .map(
-            (location) => LocationModel(
-              id: location!.id,
-              name: location.name,
-              type: location.type,
-              dimension: location.dimension,
-            ),
-          )
+          .map((location) => location!.toEntity())
           .toList();
     } catch (e) {
       throw ServerException(e.toString());
@@ -51,7 +45,7 @@ class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
   }
 
   @override
-  Future<LocationModel> getLocation({required String id}) async {
+  Future<Location> getLocation({required String id}) async {
     try {
       final result = await graphQLClient.client.query$GetLocation(
         Options$Query$GetLocation(
@@ -68,12 +62,7 @@ class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
         throw ServerException('Location not found');
       }
 
-      return LocationModel(
-        id: location.id,
-        name: location.name,
-        type: location.type,
-        dimension: location.dimension,
-      );
+      return location.toEntity();
     } catch (e) {
       throw ServerException(e.toString());
     }

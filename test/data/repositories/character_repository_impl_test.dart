@@ -3,14 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:graphql_clean_architecture/core/error/exceptions.dart';
 import 'package:graphql_clean_architecture/core/error/failures.dart';
 import 'package:graphql_clean_architecture/data/datasources/character_remote_data_source.dart';
-import 'package:graphql_clean_architecture/data/models/character_model.dart';
 import 'package:graphql_clean_architecture/data/repositories/character_repository_impl.dart';
+import 'package:graphql_clean_architecture/domain/entities/character.dart';
 
 void main() {
   group('CharacterRepositoryImpl.getCharacters', () {
     test('returns characters when the remote data source succeeds', () async {
       const characters = [
-        CharacterModel(
+        Character(
           id: '1',
           name: 'Rick Sanchez',
           status: 'Alive',
@@ -29,7 +29,7 @@ void main() {
 
       expect(
         result,
-        equals(const Right<Failure, List<CharacterModel>>(characters)),
+        equals(const Right<Failure, List<Character>>(characters)),
       );
     });
 
@@ -45,7 +45,7 @@ void main() {
       expect(
         result,
         equals(
-          const Left<Failure, List<CharacterModel>>(ServerFailure('boom')),
+          const Left<Failure, List<Character>>(ServerFailure('boom')),
         ),
       );
     });
@@ -62,7 +62,7 @@ void main() {
       expect(
         result,
         equals(
-          const Left<Failure, List<CharacterModel>>(NetworkFailure('offline')),
+          const Left<Failure, List<Character>>(NetworkFailure('offline')),
         ),
       );
     });
@@ -70,17 +70,17 @@ void main() {
 }
 
 class _FakeCharacterRemoteDataSource implements CharacterRemoteDataSource {
-  final Future<List<CharacterModel>> Function(int page)? getCharactersHandler;
+  final Future<List<Character>> Function(int page)? getCharactersHandler;
 
   const _FakeCharacterRemoteDataSource({this.getCharactersHandler});
 
   @override
-  Future<CharacterModel> getCharacter(String id) async {
+  Future<Character> getCharacter(String id) async {
     throw UnimplementedError();
   }
 
   @override
-  Future<List<CharacterModel>> getCharacters(int page) async {
+  Future<List<Character>> getCharacters(int page) async {
     if (getCharactersHandler != null) {
       return getCharactersHandler!(page);
     }

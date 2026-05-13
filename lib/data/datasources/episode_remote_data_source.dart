@@ -1,13 +1,14 @@
 import 'package:injectable/injectable.dart';
 import '../../core/error/exceptions.dart';
 import '../../core/network/graphql_client.dart';
+import '../../domain/entities/episode.dart';
 import '../graphql/__generated__/get_episode.graphql.dart';
 import '../graphql/__generated__/get_episodes.graphql.dart';
-import '../models/episode_model.dart';
+import '../mappers/episode_mapper.dart';
 
 abstract class EpisodeRemoteDataSource {
-  Future<List<EpisodeModel>> getEpisodes({required int page});
-  Future<EpisodeModel> getEpisode({required String id});
+  Future<List<Episode>> getEpisodes({required int page});
+  Future<Episode> getEpisode({required String id});
 }
 
 @LazySingleton(as: EpisodeRemoteDataSource)
@@ -17,7 +18,7 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
   EpisodeRemoteDataSourceImpl(this.graphQLClient);
 
   @override
-  Future<List<EpisodeModel>> getEpisodes({required int page}) async {
+  Future<List<Episode>> getEpisodes({required int page}) async {
     try {
       final result = await graphQLClient.client.query$GetEpisodes(
         Options$Query$GetEpisodes(
@@ -36,14 +37,7 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
 
       return episodes
           .where((episode) => episode != null)
-          .map(
-            (episode) => EpisodeModel(
-              id: episode!.id,
-              name: episode.name,
-              airDate: episode.air_date,
-              episode: episode.episode,
-            ),
-          )
+          .map((episode) => episode!.toEntity())
           .toList();
     } catch (e) {
       throw ServerException(e.toString());
@@ -51,7 +45,7 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
   }
 
   @override
-  Future<EpisodeModel> getEpisode({required String id}) async {
+  Future<Episode> getEpisode({required String id}) async {
     try {
       final result = await graphQLClient.client.query$GetEpisode(
         Options$Query$GetEpisode(variables: Variables$Query$GetEpisode(id: id)),
@@ -66,12 +60,7 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
         throw ServerException('Episode not found');
       }
 
-      return EpisodeModel(
-        id: episode.id,
-        name: episode.name,
-        airDate: episode.air_date,
-        episode: episode.episode,
-      );
+      return episode.toEntity();
     } catch (e) {
       throw ServerException(e.toString());
     }

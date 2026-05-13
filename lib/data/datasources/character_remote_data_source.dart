@@ -1,13 +1,14 @@
 import 'package:injectable/injectable.dart';
 import '../../core/error/exceptions.dart';
 import '../../core/network/graphql_client.dart';
-import '../models/character_model.dart';
+import '../../domain/entities/character.dart';
 import '../graphql/__generated__/get_characters.graphql.dart';
 import '../graphql/__generated__/get_character.graphql.dart';
+import '../mappers/character_mapper.dart';
 
 abstract class CharacterRemoteDataSource {
-  Future<List<CharacterModel>> getCharacters(int page);
-  Future<CharacterModel> getCharacter(String id);
+  Future<List<Character>> getCharacters(int page);
+  Future<Character> getCharacter(String id);
 }
 
 @LazySingleton(as: CharacterRemoteDataSource)
@@ -17,7 +18,7 @@ class CharacterRemoteDataSourceImpl implements CharacterRemoteDataSource {
   CharacterRemoteDataSourceImpl(this.graphQLClient);
 
   @override
-  Future<List<CharacterModel>> getCharacters(int page) async {
+  Future<List<Character>> getCharacters(int page) async {
     try {
       final result = await graphQLClient.client.query$GetCharacters(
         Options$Query$GetCharacters(
@@ -32,15 +33,7 @@ class CharacterRemoteDataSourceImpl implements CharacterRemoteDataSource {
       final characters = result.parsedData?.characters?.results ?? [];
       return characters
           .where((character) => character != null)
-          .map(
-            (character) => CharacterModel(
-              id: character!.id,
-              name: character.name,
-              status: character.status,
-              species: character.species,
-              image: character.image,
-            ),
-          )
+          .map((character) => character!.toEntity())
           .toList();
     } catch (e) {
       throw ServerException(e.toString());
@@ -48,7 +41,7 @@ class CharacterRemoteDataSourceImpl implements CharacterRemoteDataSource {
   }
 
   @override
-  Future<CharacterModel> getCharacter(String id) async {
+  Future<Character> getCharacter(String id) async {
     try {
       final result = await graphQLClient.client.query$GetCharacter(
         Options$Query$GetCharacter(
@@ -65,13 +58,7 @@ class CharacterRemoteDataSourceImpl implements CharacterRemoteDataSource {
         throw ServerException('Character not found');
       }
 
-      return CharacterModel(
-        id: character.id,
-        name: character.name,
-        status: character.status,
-        species: character.species,
-        image: character.image,
-      );
+      return character.toEntity();
     } catch (e) {
       throw ServerException(e.toString());
     }
