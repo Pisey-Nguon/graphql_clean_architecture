@@ -13,7 +13,9 @@ class GetLocations implements UseCase<List<Location>, GetLocationsParams> {
   GetLocations(this.repository);
 
   @override
-  Future<Either<Failure, List<Location>>> call(GetLocationsParams params) async {
+  Future<Either<Failure, List<Location>>> call(
+    GetLocationsParams params,
+  ) async {
     return await repository.getLocations(page: params.page);
   }
 }

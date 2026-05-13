@@ -10,8 +10,8 @@ class CharacterListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<CharacterBloc>()
-        ..add(const GetCharactersEvent(page: 1)),
+      create: (_) =>
+          getIt<CharacterBloc>()..add(const GetCharactersEvent(page: 1)),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Rick and Morty Characters'),

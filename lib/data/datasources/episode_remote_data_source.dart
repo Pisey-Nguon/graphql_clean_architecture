@@ -36,12 +36,14 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
 
       return episodes
           .where((episode) => episode != null)
-          .map((episode) => EpisodeModel.fromJson({
-                'id': episode!.id,
-                'name': episode.name,
-                'air_date': episode.air_date,
-                'episode': episode.episode,
-              }))
+          .map(
+            (episode) => EpisodeModel(
+              id: episode!.id,
+              name: episode.name,
+              airDate: episode.air_date,
+              episode: episode.episode,
+            ),
+          )
           .toList();
     } catch (e) {
       throw ServerException(e.toString());
@@ -52,9 +54,7 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
   Future<EpisodeModel> getEpisode({required String id}) async {
     try {
       final result = await graphQLClient.client.query$GetEpisode(
-        Options$Query$GetEpisode(
-          variables: Variables$Query$GetEpisode(id: id),
-        ),
+        Options$Query$GetEpisode(variables: Variables$Query$GetEpisode(id: id)),
       );
 
       if (result.hasException) {
@@ -66,12 +66,12 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
         throw ServerException('Episode not found');
       }
 
-      return EpisodeModel.fromJson({
-        'id': episode.id,
-        'name': episode.name,
-        'air_date': episode.air_date,
-        'episode': episode.episode,
-      });
+      return EpisodeModel(
+        id: episode.id,
+        name: episode.name,
+        airDate: episode.air_date,
+        episode: episode.episode,
+      );
     } catch (e) {
       throw ServerException(e.toString());
     }

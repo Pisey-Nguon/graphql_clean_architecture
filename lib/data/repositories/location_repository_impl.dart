@@ -13,7 +13,9 @@ class LocationRepositoryImpl implements LocationRepository {
   LocationRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<Either<Failure, List<Location>>> getLocations({required int page}) async {
+  Future<Either<Failure, List<Location>>> getLocations({
+    required int page,
+  }) async {
     try {
       final locations = await remoteDataSource.getLocations(page: page);
       return Right(locations);

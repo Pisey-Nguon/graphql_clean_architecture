@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'character_list_page.dart';
-import 'episode_list_page.dart';
-import 'location_list_page.dart';
-import 'search_page.dart';
-import 'settings_page.dart';
+
+import '../../core/navigation/app_router.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -21,10 +18,7 @@ class DashboardPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.blue.shade50,
-              Colors.white,
-            ],
+            colors: [Colors.blue.shade50, Colors.white],
           ),
         ),
         child: SafeArea(
@@ -39,16 +33,15 @@ class DashboardPage extends StatelessWidget {
                   children: [
                     Text(
                       'Welcome Back! 👋',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Explore the multiverse',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.grey[600],
-                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -65,7 +58,7 @@ class DashboardPage extends StatelessWidget {
                         title: 'Characters',
                         count: '826',
                         color: Colors.blue,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CharacterListPage())),
+                        onTap: () => context.goCharacters(),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -75,7 +68,7 @@ class DashboardPage extends StatelessWidget {
                         title: 'Episodes',
                         count: '51',
                         color: Colors.green,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EpisodeListPage())),
+                        onTap: () => context.goEpisodes(),
                       ),
                     ),
                   ],
@@ -95,7 +88,7 @@ class DashboardPage extends StatelessWidget {
                         title: 'Locations',
                         count: '126',
                         color: Colors.orange,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LocationListPage())),
+                        onTap: () => context.goLocations(),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -106,7 +99,9 @@ class DashboardPage extends StatelessWidget {
                         count: '12',
                         color: Colors.red,
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Coming soon!')));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Coming soon!')),
+                          );
                         },
                       ),
                     ),
@@ -137,43 +132,73 @@ class DashboardPage extends StatelessWidget {
                           icon: Icons.people_outline,
                           title: 'All Characters',
                           subtitle: 'Browse characters',
-                          gradient: LinearGradient(colors: [Colors.blue.shade400, Colors.blue.shade600]),
-                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CharacterListPage())),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.blue.shade400,
+                              Colors.blue.shade600,
+                            ],
+                          ),
+                          onTap: () => context.goCharacters(),
                         ),
                         _MenuCard(
                           icon: Icons.tv,
                           title: 'Episodes',
                           subtitle: 'Browse episodes',
-                          gradient: LinearGradient(colors: [Colors.green.shade400, Colors.green.shade600]),
-                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EpisodeListPage())),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.green.shade400,
+                              Colors.green.shade600,
+                            ],
+                          ),
+                          onTap: () => context.goEpisodes(),
                         ),
                         _MenuCard(
                           icon: Icons.location_on,
                           title: 'Locations',
                           subtitle: 'Explore worlds',
-                          gradient: LinearGradient(colors: [Colors.orange.shade400, Colors.orange.shade600]),
-                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LocationListPage())),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.orange.shade400,
+                              Colors.orange.shade600,
+                            ],
+                          ),
+                          onTap: () => context.goLocations(),
                         ),
                         _MenuCard(
                           icon: Icons.search,
                           title: 'Search',
                           subtitle: 'Find characters',
-                          gradient: LinearGradient(colors: [Colors.purple.shade400, Colors.purple.shade600]),
-                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SearchPage())),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.purple.shade400,
+                              Colors.purple.shade600,
+                            ],
+                          ),
+                          onTap: () => context.goSearch(),
                         ),
                         _MenuCard(
                           icon: Icons.filter_list,
                           title: 'Filter',
                           subtitle: 'By status & species',
-                          gradient: LinearGradient(colors: [Colors.teal.shade400, Colors.teal.shade600]),
-                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SearchPage())),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.teal.shade400,
+                              Colors.teal.shade600,
+                            ],
+                          ),
+                          onTap: () => context.goSearch(),
                         ),
                         _MenuCard(
                           icon: Icons.settings,
                           title: 'Settings',
                           subtitle: 'App configuration',
-                          gradient: LinearGradient(colors: [Colors.grey.shade600, Colors.grey.shade800]),
-                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage())),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.grey.shade600,
+                              Colors.grey.shade800,
+                            ],
+                          ),
+                          onTap: () => context.goSettings(),
                         ),
                       ],
                     ),
@@ -296,13 +321,20 @@ class _MenuCard extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 title,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 4),
               Text(
                 subtitle,
-                style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.9)),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white.withValues(alpha: 0.9),
+                ),
                 textAlign: TextAlign.center,
               ),
             ],

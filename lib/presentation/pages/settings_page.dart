@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -20,10 +21,7 @@ class SettingsPage extends StatelessWidget {
                 icon: Icons.dark_mode,
                 title: 'Dark Mode',
                 subtitle: 'Toggle dark theme',
-                trailing: Switch(
-                  value: false,
-                  onChanged: (value) {},
-                ),
+                trailing: Switch(value: false, onChanged: (value) {}),
               ),
               _SettingsTile(
                 icon: Icons.color_lens,
@@ -50,10 +48,7 @@ class SettingsPage extends StatelessWidget {
                 icon: Icons.sync,
                 title: 'Auto-sync',
                 subtitle: 'Sync data automatically',
-                trailing: Switch(
-                  value: true,
-                  onChanged: (value) {},
-                ),
+                trailing: Switch(value: true, onChanged: (value) {}),
               ),
             ],
           ),
@@ -120,7 +115,7 @@ class SettingsPage extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             child: const Text('Got it!'),
           ),
         ],
@@ -133,10 +128,7 @@ class _SettingsSection extends StatelessWidget {
   final String title;
   final List<Widget> children;
 
-  const _SettingsSection({
-    required this.title,
-    required this.children,
-  });
+  const _SettingsSection({required this.title, required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -199,18 +191,12 @@ class _SettingsTile extends StatelessWidget {
       ),
       title: Text(
         title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-        ),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       ),
       subtitle: subtitle != null
           ? Text(
               subtitle!,
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
             )
           : null,
       trailing: trailing,

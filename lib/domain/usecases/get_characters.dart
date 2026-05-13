@@ -13,7 +13,9 @@ class GetCharacters implements UseCase<List<Character>, GetCharactersParams> {
   GetCharacters(this.repository);
 
   @override
-  Future<Either<Failure, List<Character>>> call(GetCharactersParams params) async {
+  Future<Either<Failure, List<Character>>> call(
+    GetCharactersParams params,
+  ) async {
     return await repository.getCharacters(params.page);
   }
 }

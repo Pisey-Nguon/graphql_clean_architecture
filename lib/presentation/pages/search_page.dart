@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../core/di/injection_container.dart';
+import '../../core/navigation/app_router.dart';
 import '../../domain/entities/character.dart';
 import '../bloc/character_bloc.dart';
-import 'character_detail_page.dart';
+import '../widgets/app_state_views.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -26,8 +28,8 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<CharacterBloc>()
-        ..add(const GetCharactersEvent(page: 1)),
+      create: (_) =>
+          getIt<CharacterBloc>()..add(const GetCharactersEvent(page: 1)),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Search Characters'),
@@ -106,7 +108,7 @@ class _SearchPageState extends State<SearchPage> {
               child: BlocBuilder<CharacterBloc, CharacterState>(
                 builder: (context, state) {
                   if (state is CharacterLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const AppLoadingView();
                   } else if (state is CharactersLoaded) {
                     final filteredCharacters = _filterCharacters(
                       state.characters,
@@ -116,33 +118,10 @@ class _SearchPageState extends State<SearchPage> {
                     );
 
                     if (filteredCharacters.isEmpty) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.search_off,
-                              size: 80,
-                              color: Colors.grey[400],
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No characters found',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Try adjusting your filters',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[500],
-                              ),
-                            ),
-                          ],
-                        ),
+                      return const AppEmptyState(
+                        icon: Icons.search_off,
+                        title: 'No characters found',
+                        subtitle: 'Try adjusting your filters',
                       );
                     }
 
@@ -155,27 +134,19 @@ class _SearchPageState extends State<SearchPage> {
                       },
                     );
                   } else if (state is CharacterError) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.error, size: 60, color: Colors.red),
-                          const SizedBox(height: 16),
-                          Text('Error: ${state.message}'),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: () {
-                              context.read<CharacterBloc>().add(
-                                const GetCharactersEvent(page: 1),
-                              );
-                            },
-                            child: const Text('Retry'),
-                          ),
-                        ],
-                      ),
+                    return AppErrorView(
+                      message: state.message,
+                      onRetry: () {
+                        context.read<CharacterBloc>().add(
+                          const GetCharactersEvent(page: 1),
+                        );
+                      },
                     );
                   }
-                  return const Center(child: Text('Start searching!'));
+                  return const AppEmptyState(
+                    icon: Icons.search,
+                    title: 'Start searching!',
+                  );
                 },
               ),
             ),
@@ -192,12 +163,15 @@ class _SearchPageState extends State<SearchPage> {
     String species,
   ) {
     return characters.where((character) {
-      final matchesQuery = query.isEmpty ||
+      final matchesQuery =
+          query.isEmpty ||
           character.name.toLowerCase().contains(query.toLowerCase());
       final matchesStatus =
-          status == 'All' || character.status.toLowerCase() == status.toLowerCase();
+          status == 'All' ||
+          character.status.toLowerCase() == status.toLowerCase();
       final matchesSpecies =
-          species == 'All' || character.species.toLowerCase() == species.toLowerCase();
+          species == 'All' ||
+          character.species.toLowerCase() == species.toLowerCase();
 
       return matchesQuery && matchesStatus && matchesSpecies;
     }).toList();
@@ -260,11 +234,8 @@ class _SearchResultCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => CharacterDetailPage(characterId: character.id),
-            ),
+          context.goCharacterDetail(
+            args: CharacterDetailRouteArgs(characterId: character.id),
           );
         },
         child: Padding(

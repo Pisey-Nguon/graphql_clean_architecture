@@ -130,12 +130,19 @@ const MAX_RETRY_ATTEMPTS = 3;  // Use camelCase, not SCREAMING_SNAKE_CASE
 ### Directory Structure (MANDATORY)
 ```
 lib/
+├── app/                           # App shell
+│   └── app.dart
 ├── core/                          # Shared utilities
+│   ├── config/                    # Shared app config
+│   │   ├── app_endpoint.dart
+│   │   └── app_theme.dart
 │   ├── di/                        # Dependency injection
 │   │   └── injection_container.dart
 │   ├── error/                     # Error handling
 │   │   ├── exceptions.dart
 │   │   └── failures.dart
+│   ├── navigation/                # Route registration
+│   │   └── app_router.dart
 │   ├── network/                   # Network services
 │   │   └── graphql_client.dart
 │   └── usecase/
@@ -186,6 +193,15 @@ lib/
 - Files ending with `.g.dart`, `.config.dart` are auto-generated
 - Changes will be overwritten on next build
 - Edit source files and regenerate instead
+
+**Rule 8a: Keep App-Wide Routing Centralized**
+- Register named routes in `lib/core/navigation/app_router.dart`
+- Prefer `pushNamed` over ad hoc `MaterialPageRoute` when a shared route already exists
+- Use typed route argument classes for detail screens
+
+**Rule 8b: Keep App-Wide Theme Centralized**
+- Shared theme configuration belongs in `lib/core/config/app_theme.dart`
+- Do not duplicate app-wide theme setup inside individual pages
 
 ---
 

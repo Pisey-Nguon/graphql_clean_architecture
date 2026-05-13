@@ -36,12 +36,14 @@ class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
 
       return locations
           .where((location) => location != null)
-          .map((location) => LocationModel.fromJson({
-                'id': location!.id,
-                'name': location.name,
-                'type': location.type,
-                'dimension': location.dimension,
-              }))
+          .map(
+            (location) => LocationModel(
+              id: location!.id,
+              name: location.name,
+              type: location.type,
+              dimension: location.dimension,
+            ),
+          )
           .toList();
     } catch (e) {
       throw ServerException(e.toString());
@@ -66,12 +68,12 @@ class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
         throw ServerException('Location not found');
       }
 
-      return LocationModel.fromJson({
-        'id': location.id,
-        'name': location.name,
-        'type': location.type,
-        'dimension': location.dimension,
-      });
+      return LocationModel(
+        id: location.id,
+        name: location.name,
+        type: location.type,
+        dimension: location.dimension,
+      );
     } catch (e) {
       throw ServerException(e.toString());
     }

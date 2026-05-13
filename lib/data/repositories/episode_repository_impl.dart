@@ -13,7 +13,9 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
   EpisodeRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<Either<Failure, List<Episode>>> getEpisodes({required int page}) async {
+  Future<Either<Failure, List<Episode>>> getEpisodes({
+    required int page,
+  }) async {
     try {
       final episodes = await remoteDataSource.getEpisodes(page: page);
       return Right(episodes);

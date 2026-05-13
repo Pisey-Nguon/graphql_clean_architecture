@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../core/di/injection_container.dart';
 import '../bloc/episode_bloc.dart';
 import '../bloc/episode_event.dart';
 import '../bloc/episode_state.dart';
+import '../widgets/app_state_views.dart';
 
 class EpisodeDetailPage extends StatelessWidget {
   final String episodeId;
@@ -18,7 +20,9 @@ class EpisodeDetailPage extends StatelessWidget {
         body: BlocBuilder<EpisodeBloc, EpisodeState>(
           builder: (context, state) {
             if (state is EpisodeLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const AppLoadingView(
+                message: 'Loading episode details...',
+              );
             } else if (state is EpisodeLoaded) {
               final episode = state.episode;
               return CustomScrollView(
@@ -31,11 +35,18 @@ class EpisodeDetailPage extends StatelessWidget {
                       background: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Colors.green.shade400, Colors.green.shade700],
+                            colors: [
+                              Colors.green.shade400,
+                              Colors.green.shade700,
+                            ],
                           ),
                         ),
                         child: Center(
-                          child: Icon(Icons.tv, size: 80, color: Colors.white.withValues(alpha: 0.3)),
+                          child: Icon(
+                            Icons.tv,
+                            size: 80,
+                            color: Colors.white.withValues(alpha: 0.3),
+                          ),
                         ),
                       ),
                     ),
@@ -48,7 +59,10 @@ class EpisodeDetailPage extends StatelessWidget {
                         children: [
                           Text(
                             episode.name,
-                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 16),
                           _InfoCard(
@@ -76,18 +90,9 @@ class EpisodeDetailPage extends StatelessWidget {
                 ],
               );
             } else if (state is EpisodeError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error, size: 60, color: Colors.red),
-                    const SizedBox(height: 16),
-                    Text('Error: ${state.message}'),
-                  ],
-                ),
-              );
+              return AppErrorView(message: state.message);
             }
-            return const SizedBox();
+            return const AppLoadingView(message: 'Loading episode details...');
           },
         ),
       ),
@@ -139,9 +144,18 @@ class _InfoCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                Text(
+                  title,
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
                 const SizedBox(height: 4),
-                Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           ),

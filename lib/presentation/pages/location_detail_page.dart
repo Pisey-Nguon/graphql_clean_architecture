@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../core/di/injection_container.dart';
 import '../bloc/location_bloc.dart';
 import '../bloc/location_event.dart';
 import '../bloc/location_state.dart';
+import '../widgets/app_state_views.dart';
 
 class LocationDetailPage extends StatelessWidget {
   final String locationId;
@@ -13,12 +15,15 @@ class LocationDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<LocationBloc>()..add(GetLocationEvent(id: locationId)),
+      create: (_) =>
+          getIt<LocationBloc>()..add(GetLocationEvent(id: locationId)),
       child: Scaffold(
         body: BlocBuilder<LocationBloc, LocationState>(
           builder: (context, state) {
             if (state is LocationLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const AppLoadingView(
+                message: 'Loading location details...',
+              );
             } else if (state is LocationLoaded) {
               final location = state.location;
               return CustomScrollView(
@@ -31,11 +36,18 @@ class LocationDetailPage extends StatelessWidget {
                       background: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Colors.orange.shade400, Colors.orange.shade700],
+                            colors: [
+                              Colors.orange.shade400,
+                              Colors.orange.shade700,
+                            ],
                           ),
                         ),
                         child: Center(
-                          child: Icon(Icons.public, size: 80, color: Colors.white.withValues(alpha: 0.3)),
+                          child: Icon(
+                            Icons.public,
+                            size: 80,
+                            color: Colors.white.withValues(alpha: 0.3),
+                          ),
                         ),
                       ),
                     ),
@@ -77,18 +89,9 @@ class LocationDetailPage extends StatelessWidget {
                 ],
               );
             } else if (state is LocationError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error, size: 60, color: Colors.red),
-                    const SizedBox(height: 16),
-                    Text('Error: ${state.message}'),
-                  ],
-                ),
-              );
+              return AppErrorView(message: state.message);
             }
-            return const SizedBox();
+            return const AppLoadingView(message: 'Loading location details...');
           },
         ),
       ),
@@ -140,9 +143,18 @@ class _InfoCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                Text(
+                  title,
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
                 const SizedBox(height: 4),
-                Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           ),

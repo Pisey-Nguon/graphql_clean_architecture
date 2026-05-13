@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../core/di/injection_container.dart';
+import '../../core/navigation/app_router.dart';
 import '../bloc/episode_bloc.dart';
 import '../bloc/episode_event.dart';
 import '../bloc/episode_state.dart';
-import 'episode_detail_page.dart';
+import '../widgets/app_state_views.dart';
 
 class EpisodeListPage extends StatelessWidget {
   const EpisodeListPage({super.key});
@@ -21,11 +23,13 @@ class EpisodeListPage extends StatelessWidget {
         body: BlocBuilder<EpisodeBloc, EpisodeState>(
           builder: (context, state) {
             if (state is EpisodeLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const AppLoadingView();
             } else if (state is EpisodesLoaded) {
               return RefreshIndicator(
                 onRefresh: () async {
-                  context.read<EpisodeBloc>().add(const GetEpisodesEvent(page: 1));
+                  context.read<EpisodeBloc>().add(
+                    const GetEpisodesEvent(page: 1),
+                  );
                 },
                 child: ListView.builder(
                   padding: const EdgeInsets.all(8),
@@ -33,12 +37,17 @@ class EpisodeListPage extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final episode = state.episodes[index];
                     return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 8,
+                      ),
                       child: ListTile(
                         leading: CircleAvatar(
                           backgroundColor: Colors.green.shade100,
                           child: Text(
-                            episode.episode.replaceAll('S', '').replaceAll('E', '.'),
+                            episode.episode
+                                .replaceAll('S', '')
+                                .replaceAll('E', '.'),
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
@@ -56,11 +65,8 @@ class EpisodeListPage extends StatelessWidget {
                         ),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => EpisodeDetailPage(episodeId: episode.id),
-                            ),
+                          context.goEpisodeDetail(
+                            args: EpisodeDetailRouteArgs(episodeId: episode.id),
                           );
                         },
                       ),
@@ -69,25 +75,16 @@ class EpisodeListPage extends StatelessWidget {
                 ),
               );
             } else if (state is EpisodeError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error, size: 60, color: Colors.red),
-                    const SizedBox(height: 16),
-                    Text('Error: ${state.message}'),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<EpisodeBloc>().add(const GetEpisodesEvent(page: 1));
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
+              return AppErrorView(
+                message: state.message,
+                onRetry: () {
+                  context.read<EpisodeBloc>().add(
+                    const GetEpisodesEvent(page: 1),
+                  );
+                },
               );
             }
-            return const SizedBox();
+            return const AppLoadingView(message: 'Loading episodes...');
           },
         ),
       ),

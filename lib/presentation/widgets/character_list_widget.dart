@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../core/navigation/app_router.dart';
 import '../../domain/entities/character.dart';
 import '../bloc/character_bloc.dart';
-import '../pages/character_detail_page.dart';
+import 'app_state_views.dart';
 
 class CharacterListWidget extends StatelessWidget {
   const CharacterListWidget({super.key});
@@ -12,9 +14,7 @@ class CharacterListWidget extends StatelessWidget {
     return BlocBuilder<CharacterBloc, CharacterState>(
       builder: (context, state) {
         if (state is CharacterLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const AppLoadingView();
         } else if (state is CharactersLoaded) {
           return RefreshIndicator(
             onRefresh: () async {
@@ -32,36 +32,18 @@ class CharacterListWidget extends StatelessWidget {
             ),
           );
         } else if (state is CharacterError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.error_outline,
-                  color: Colors.red,
-                  size: 60,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Error: ${state.message}',
-                  style: const TextStyle(fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    context.read<CharacterBloc>().add(
-                      const GetCharactersEvent(page: 1),
-                    );
-                  },
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
+          return AppErrorView(
+            message: state.message,
+            onRetry: () {
+              context.read<CharacterBloc>().add(
+                const GetCharactersEvent(page: 1),
+              );
+            },
           );
         }
-        return const Center(
-          child: Text('Welcome! Pull to load characters'),
+        return const AppEmptyState(
+          icon: Icons.people_outline,
+          title: 'Welcome! Pull to load characters',
         );
       },
     );
@@ -78,16 +60,11 @@ class CharacterCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => CharacterDetailPage(characterId: character.id),
-            ),
+          context.goCharacterDetail(
+            args: CharacterDetailRouteArgs(characterId: character.id),
           );
         },
         child: Padding(
@@ -179,10 +156,7 @@ class _StatusIndicator extends StatelessWidget {
     return Container(
       width: 10,
       height: 10,
-      decoration: BoxDecoration(
-        color: statusColor,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
     );
   }
 }

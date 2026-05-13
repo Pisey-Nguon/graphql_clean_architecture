@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../core/di/injection_container.dart';
+import '../../core/navigation/app_router.dart';
 import '../bloc/location_bloc.dart';
 import '../bloc/location_event.dart';
 import '../bloc/location_state.dart';
-import 'location_detail_page.dart';
+import '../widgets/app_state_views.dart';
 
 class LocationListPage extends StatelessWidget {
   const LocationListPage({super.key});
@@ -12,7 +14,8 @@ class LocationListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<LocationBloc>()..add(const GetLocationsEvent(page: 1)),
+      create: (_) =>
+          getIt<LocationBloc>()..add(const GetLocationsEvent(page: 1)),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Locations'),
@@ -21,11 +24,13 @@ class LocationListPage extends StatelessWidget {
         body: BlocBuilder<LocationBloc, LocationState>(
           builder: (context, state) {
             if (state is LocationLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const AppLoadingView();
             } else if (state is LocationsLoaded) {
               return RefreshIndicator(
                 onRefresh: () async {
-                  context.read<LocationBloc>().add(const GetLocationsEvent(page: 1));
+                  context.read<LocationBloc>().add(
+                    const GetLocationsEvent(page: 1),
+                  );
                 },
                 child: ListView.builder(
                   padding: const EdgeInsets.all(8),
@@ -33,7 +38,10 @@ class LocationListPage extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final location = state.locations[index];
                     return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 8,
+                      ),
                       child: ListTile(
                         leading: Container(
                           width: 48,
@@ -42,7 +50,10 @@ class LocationListPage extends StatelessWidget {
                             color: Colors.orange.shade100,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Icon(Icons.location_on, color: Colors.orange.shade700),
+                          child: Icon(
+                            Icons.location_on,
+                            color: Colors.orange.shade700,
+                          ),
                         ),
                         title: Text(
                           location.name,
@@ -54,10 +65,9 @@ class LocationListPage extends StatelessWidget {
                         ),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => LocationDetailPage(locationId: location.id),
+                          context.goLocationDetail(
+                            args: LocationDetailRouteArgs(
+                              locationId: location.id,
                             ),
                           );
                         },
@@ -67,25 +77,16 @@ class LocationListPage extends StatelessWidget {
                 ),
               );
             } else if (state is LocationError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error, size: 60, color: Colors.red),
-                    const SizedBox(height: 16),
-                    Text('Error: ${state.message}'),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<LocationBloc>().add(const GetLocationsEvent(page: 1));
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
+              return AppErrorView(
+                message: state.message,
+                onRetry: () {
+                  context.read<LocationBloc>().add(
+                    const GetLocationsEvent(page: 1),
+                  );
+                },
               );
             }
-            return const SizedBox();
+            return const AppLoadingView(message: 'Loading locations...');
           },
         ),
       ),

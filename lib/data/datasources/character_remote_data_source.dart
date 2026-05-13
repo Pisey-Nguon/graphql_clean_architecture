@@ -32,13 +32,15 @@ class CharacterRemoteDataSourceImpl implements CharacterRemoteDataSource {
       final characters = result.parsedData?.characters?.results ?? [];
       return characters
           .where((character) => character != null)
-          .map((character) => CharacterModel(
-                id: character!.id,
-                name: character.name,
-                status: character.status,
-                species: character.species,
-                image: character.image,
-              ))
+          .map(
+            (character) => CharacterModel(
+              id: character!.id,
+              name: character.name,
+              status: character.status,
+              species: character.species,
+              image: character.image,
+            ),
+          )
           .toList();
     } catch (e) {
       throw ServerException(e.toString());

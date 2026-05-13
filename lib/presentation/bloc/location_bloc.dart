@@ -10,10 +10,8 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   final GetLocations getLocations;
   final GetLocation getLocation;
 
-  LocationBloc({
-    required this.getLocations,
-    required this.getLocation,
-  }) : super(LocationInitial()) {
+  LocationBloc({required this.getLocations, required this.getLocation})
+    : super(LocationInitial()) {
     on<GetLocationsEvent>(_onGetLocations);
     on<GetLocationEvent>(_onGetLocation);
   }

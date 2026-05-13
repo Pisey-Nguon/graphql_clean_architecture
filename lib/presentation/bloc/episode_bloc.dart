@@ -10,10 +10,8 @@ class EpisodeBloc extends Bloc<EpisodeEvent, EpisodeState> {
   final GetEpisodes getEpisodes;
   final GetEpisode getEpisode;
 
-  EpisodeBloc({
-    required this.getEpisodes,
-    required this.getEpisode,
-  }) : super(EpisodeInitial()) {
+  EpisodeBloc({required this.getEpisodes, required this.getEpisode})
+    : super(EpisodeInitial()) {
     on<GetEpisodesEvent>(_onGetEpisodes);
     on<GetEpisodeEvent>(_onGetEpisode);
   }

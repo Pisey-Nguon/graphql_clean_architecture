@@ -40,9 +40,7 @@ class CharacterBloc extends Bloc<CharacterEvent, CharacterState> {
     Emitter<CharacterState> emit,
   ) async {
     emit(CharacterLoading());
-    final result = await getCharacterUseCase(
-      GetCharacterParams(id: event.id),
-    );
+    final result = await getCharacterUseCase(GetCharacterParams(id: event.id));
     result.fold(
       (failure) => emit(CharacterError(message: failure.message)),
       (character) => emit(CharacterLoaded(character: character)),

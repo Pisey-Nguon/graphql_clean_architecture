@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../core/di/injection_container.dart';
 import '../../domain/entities/character.dart';
 import '../bloc/character_bloc.dart';
+import '../widgets/app_state_views.dart';
 
 class CharacterDetailPage extends StatelessWidget {
   final String characterId;
@@ -12,14 +14,14 @@ class CharacterDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<CharacterBloc>()
-        ..add(GetCharacterEvent(id: characterId)),
+      create: (_) =>
+          getIt<CharacterBloc>()..add(GetCharacterEvent(id: characterId)),
       child: Scaffold(
         body: BlocBuilder<CharacterBloc, CharacterState>(
           builder: (context, state) {
             if (state is CharacterLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
+              return const AppLoadingView(
+                message: 'Loading character details...',
               );
             } else if (state is CharacterLoaded) {
               final character = state.character;
@@ -105,36 +107,17 @@ class CharacterDetailPage extends StatelessWidget {
                 ],
               );
             } else if (state is CharacterError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      color: Colors.red,
-                      size: 60,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Error: ${state.message}',
-                      style: const TextStyle(fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        context
-                            .read<CharacterBloc>()
-                            .add(GetCharacterEvent(id: characterId));
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
+              return AppErrorView(
+                message: state.message,
+                onRetry: () {
+                  context.read<CharacterBloc>().add(
+                    GetCharacterEvent(id: characterId),
+                  );
+                },
               );
             }
-            return const Center(
-              child: Text('Loading character details...'),
+            return const AppLoadingView(
+              message: 'Loading character details...',
             );
           },
         ),
@@ -194,11 +177,7 @@ class CharacterDetailContent extends StatelessWidget {
             value: character.species,
           ),
           const SizedBox(height: 16),
-          _DetailRow(
-            icon: Icons.tag,
-            label: 'ID',
-            value: character.id,
-          ),
+          _DetailRow(icon: Icons.tag, label: 'ID', value: character.id),
           const SizedBox(height: 24),
           // Action Buttons
           Row(
@@ -227,9 +206,7 @@ class CharacterDetailContent extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('View origin coming soon!'),
-                      ),
+                      const SnackBar(content: Text('View origin coming soon!')),
                     );
                   },
                   icon: const Icon(Icons.location_on),
@@ -338,10 +315,7 @@ class _StatusBadge extends StatelessWidget {
           Container(
             width: 8,
             height: 8,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 6),
           Text(
