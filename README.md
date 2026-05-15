@@ -61,8 +61,8 @@ lib/
 ├── data/
 │   ├── datasources/
 │   ├── graphql/
-│   │   ├── *.graphql.dart            # Source documents for codegen
-│   │   ├── schema.graphql.dart
+│   │   ├── *.graphql                 # Source documents for codegen
+│   │   ├── schema.graphql            # Local SDL snapshot of the backend schema
 │   │   └── __generated__/            # generated, do not edit
 │   ├── models/
 │   └── repositories/
@@ -83,7 +83,7 @@ lib/
 2. The BLoC calls a domain use case.
 3. The use case calls a domain repository contract.
 4. The data-layer repository implementation delegates to a data source.
-5. The data source executes a generated GraphQL query and maps the response into models.
+5. The data source executes a generated GraphQL query and maps the response into domain entities.
 6. The repository converts exceptions into `Failure` values.
 7. The BLoC emits the next UI state.
 
@@ -113,11 +113,29 @@ flutter test
 dart format lib test
 dart run build_runner build --delete-conflicting-outputs
 ```
-### To get latest update of schema.graphql
+
+### Refresh `schema.graphql` after backend updates
+
+The generated Dart operation types come from your `.graphql` documents plus the codegen configuration. The committed `lib/data/graphql/schema.graphql` file is a local SDL snapshot that is useful for inspection and for keeping the repository aligned with the backend contract.
+
+To download the latest schema into this project:
+
 ```bash
-graphql get-schema https://rickandmortyapi.com/graphql -o lib/data/graphql/schema.graphql
+npx --yes @graphql-inspector/cli introspect https://rickandmortyapi.com/graphql --write lib/data/graphql/schema.graphql
 dart run build_runner build --delete-conflicting-outputs
 ```
+
+If your backend requires authentication, add one or more headers:
+
+```bash
+npx --yes @graphql-inspector/cli introspect https://your-backend/graphql \
+  -h "Authorization: Bearer <token>" \
+  --write lib/data/graphql/schema.graphql
+dart run build_runner build --delete-conflicting-outputs
+```
+
+Use `dart run`, not `flutter pub run`, for build runner commands.
+
 ### Optional Auth Token
 
 This sample uses the public Rick and Morty GraphQL API and does not need auth.
@@ -185,7 +203,7 @@ Before opening a PR for a new feature, verify:
 
 ## Supporting Docs
 
-- `DEVELOPER_GUIDE.md`: deeper implementation workflow and day-to-day guidance
-- `PROJECT_RULES.md`: coding standards and architecture rules
-- `CLEAN_ARCHITECTURE_README.md`: supplementary architecture notes
+- `DEVELOPER_GUIDE.md`: local setup, daily workflow, code generation, and schema refresh
+- `PROJECT_RULES.md`: architecture boundaries and project conventions
+- `CLEAN_ARCHITECTURE_README.md`: the deeper explanation of why this repo is structured this way
 - `CONTRIBUTING.md`: contribution process

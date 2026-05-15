@@ -5,11 +5,11 @@ import '../graphql/__generated__/get_characters.graphql.dart';
 extension GetCharacterMapper on Query$GetCharacter$character {
   Character toEntity() {
     return Character(
-      id: id,
-      name: name,
-      status: status,
-      species: species,
-      image: image,
+      id: id ?? '',
+      name: name ?? 'N/A',
+      status: status ?? 'N/A',
+      species: species ?? 'N/A',
+      image: image ?? 'N/A',
     );
   }
 }
@@ -17,11 +17,11 @@ extension GetCharacterMapper on Query$GetCharacter$character {
 extension GetCharactersMapper on Query$GetCharacters$characters$results {
   Character toEntity() {
     return Character(
-      id: id,
-      name: name,
-      status: status,
-      species: species,
-      image: image,
+      id: id ?? '',
+      name: name ?? 'N/A',
+      status: status ?? 'N/A',
+      species: species ?? 'N/A',
+      image: image ?? 'N/A',
     );
   }
 }

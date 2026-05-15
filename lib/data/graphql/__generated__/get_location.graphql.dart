@@ -445,10 +445,10 @@ class Query$GetLocation$Widget
 
 class Query$GetLocation$location {
   Query$GetLocation$location({
-    required this.id,
-    required this.name,
-    required this.type,
-    required this.dimension,
+    this.id,
+    this.name,
+    this.type,
+    this.dimension,
     this.$__typename = 'Location',
   });
 
@@ -459,21 +459,21 @@ class Query$GetLocation$location {
     final l$dimension = json['dimension'];
     final l$$__typename = json['__typename'];
     return Query$GetLocation$location(
-      id: (l$id as String),
-      name: (l$name as String),
-      type: (l$type as String),
-      dimension: (l$dimension as String),
+      id: (l$id as String?),
+      name: (l$name as String?),
+      type: (l$type as String?),
+      dimension: (l$dimension as String?),
       $__typename: (l$$__typename as String),
     );
   }
 
-  final String id;
+  final String? id;
 
-  final String name;
+  final String? name;
 
-  final String type;
+  final String? type;
 
-  final String dimension;
+  final String? dimension;
 
   final String $__typename;
 
@@ -582,16 +582,12 @@ class _CopyWithImpl$Query$GetLocation$location<TRes>
     Object? $__typename = _undefined,
   }) => _then(
     Query$GetLocation$location(
-      id: id == _undefined || id == null ? _instance.id : (id as String),
-      name: name == _undefined || name == null
-          ? _instance.name
-          : (name as String),
-      type: type == _undefined || type == null
-          ? _instance.type
-          : (type as String),
-      dimension: dimension == _undefined || dimension == null
+      id: id == _undefined ? _instance.id : (id as String?),
+      name: name == _undefined ? _instance.name : (name as String?),
+      type: type == _undefined ? _instance.type : (type as String?),
+      dimension: dimension == _undefined
           ? _instance.dimension
-          : (dimension as String),
+          : (dimension as String?),
       $__typename: $__typename == _undefined || $__typename == null
           ? _instance.$__typename
           : ($__typename as String),

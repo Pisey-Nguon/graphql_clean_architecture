@@ -1,204 +1,163 @@
-# Clean Architecture + GraphQL Flutter Project
+# Clean Architecture Notes
 
-This project demonstrates a Flutter application built with **Clean Architecture** principles and **GraphQL** integration using the Rick and Morty API.
+This repository is a small but real vertical-slice Flutter app. It is useful as a teaching project because it shows the full request path from page to backend and back without hiding that flow behind too much framework code.
 
-## 🏗️ Architecture Overview
+Use it as a reference for structure and boundaries, not as a direct copy of every UI or product decision.
 
-The project follows Clean Architecture with three main layers:
+## What Is Actually Implemented
 
-### 1. **Presentation Layer** (`lib/presentation/`)
-- **BLoC**: State management using flutter_bloc
-- **Pages**: UI screens
-- **Widgets**: Reusable UI components
+The project has three backend-backed feature slices:
 
-### 2. **Domain Layer** (`lib/domain/`)
-- **Entities**: Business models (Character)
-- **Repositories**: Abstract repository interfaces
-- **Use Cases**: Business logic (GetCharacters, GetCharacter)
+- Characters: list and detail
+- Episodes: list and detail
+- Locations: list and detail
 
-### 3. **Data Layer** (`lib/data/`)
-- **Models**: Data models with JSON serialization
-- **Data Sources**: Remote data sources for API calls
-- **Repositories**: Implementation of domain repositories
+It also has three app-level surfaces:
 
-### 4. **Core Layer** (`lib/core/`)
-- **DI**: Dependency injection setup (get_it + injectable)
-- **Network**: GraphQL client configuration
-- **Error**: Error handling (Failures & Exceptions)
-- **UseCase**: Base use case interface
+- Dashboard: entry page that routes to the feature areas
+- Search: client-side filtering over loaded characters
+- Settings: mostly static placeholder page for app-level controls
 
-## 📦 Key Dependencies
+That distinction matters if you plan to reuse this as a template. The backend and domain patterns are strongest in the character, episode, and location slices. Search and settings mainly show presentation patterns.
 
-- **graphql_flutter** (^5.1.2): GraphQL client
-- **flutter_bloc** (^8.1.3): State management
-- **get_it** (^7.6.4): Service locator for DI
-- **injectable** (^2.3.2): Code generation for DI
-- **dartz** (^0.10.1): Functional programming (Either type)
-- **equatable** (^2.0.5): Value equality
-- **freezed** (^2.4.5): Code generation for models
-- **json_serializable** (^6.7.1): JSON serialization
+## Architectural Goal
 
-## 🚀 Getting Started
+The main rule is simple: dependencies point inward.
 
-### Prerequisites
-- Flutter SDK (3.10.8 or higher)
-- Dart SDK
+- Presentation depends on domain use cases.
+- Domain depends only on abstractions and entities.
+- Data depends on domain contracts and on infrastructure details such as GraphQL.
+- Core holds app-wide concerns that are shared across slices.
 
-### Installation
+The domain layer does not know about Flutter widgets, GraphQL result classes, or generated files.
 
-1. **Install dependencies:**
-   ```bash
-   flutter pub get
-   ```
+## Layer Responsibilities
 
-2. **Generate code:**
-   ```bash
-   dart run build_runner build --delete-conflicting-outputs
-   ```
+### Presentation
 
-3. **Run the app:**
-   ```bash
-   flutter run
-   ```
+Presentation lives in `lib/presentation/`.
 
-## 📱 Features
+- Pages set up screens and `BlocProvider`s.
+- BLoCs translate UI events into use case calls.
+- Widgets render loading, success, empty, and error states.
 
-- **Character List**: Displays a list of Rick and Morty characters
-- **Character Details**: Shows detailed information about a selected character
-- **Pull to Refresh**: Reload character list
-- **Error Handling**: Graceful error messages with retry functionality
-- **Hero Animations**: Smooth transitions between screens
+Patterns worth copying:
 
-## 🔧 Project Structure
+- Shared UI state widgets live in `presentation/widgets/app_state_views.dart`.
+- Route helpers live in `core/navigation/app_router.dart` and keep navigation type-safe.
+- `CharacterDetailPage` can receive an `initialCharacter` and skip a second fetch when the list page already has enough data.
 
-```
-lib/
-├── core/
-│   ├── di/
-│   │   ├── injection_container.dart
-│   │   └── injection_container.config.dart (generated)
-│   ├── error/
-│   │   ├── exceptions.dart
-│   │   └── failures.dart
-│   ├── network/
-│   │   └── graphql_client.dart
-│   └── usecase/
-│       └── usecase.dart
-├── data/
-│   ├── datasources/
-│   │   └── character_remote_data_source.dart
-│   ├── models/
-│   │   ├── character_model.dart
-│   │   └── character_model.g.dart (generated)
-│   └── repositories/
-│       └── character_repository_impl.dart
-├── domain/
-│   ├── entities/
-│   │   └── character.dart
-│   ├── repositories/
-│   │   └── character_repository.dart
-│   └── usecases/
-│       ├── get_character.dart
-│       └── get_characters.dart
-├── presentation/
-│   ├── bloc/
-│   │   ├── character_bloc.dart
-│   │   ├── character_event.dart
-│   │   └── character_state.dart
-│   ├── pages/
-│   │   ├── character_detail_page.dart
-│   │   └── character_list_page.dart
-│   └── widgets/
-│       └── character_list_widget.dart
-└── main.dart
-```
+### Domain
 
-## 🔄 Data Flow
+Domain lives in `lib/domain/`.
 
-1. **UI** triggers an event (e.g., load characters)
-2. **BLoC** receives the event
-3. **BLoC** calls appropriate **Use Case**
-4. **Use Case** calls **Repository** interface
-5. **Repository Implementation** uses **Data Source**
-6. **Data Source** makes **GraphQL** API call
-7. **Result** flows back through the layers
-8. **BLoC** emits new **State**
-9. **UI** rebuilds based on new state
+- Entities are plain Dart value objects using `Equatable`.
+- Repository interfaces define what the app needs, not how data is fetched.
+- Use cases are thin and return `Either<Failure, T>`.
 
-## 🎯 Clean Architecture Benefits
+This layer is intentionally boring. That is a good sign. If domain code starts importing GraphQL, Flutter, or generated models, the boundary is already leaking.
 
-- **Independence**: Each layer is independent and testable
-- **Flexibility**: Easy to swap implementations
-- **Maintainability**: Clear separation of concerns
-- **Testability**: Easy to write unit tests for each layer
-- **Scalability**: Easy to add new features
+### Data
 
-## 🔌 GraphQL Integration
+Data lives in `lib/data/`.
 
-The project uses the Rick and Morty GraphQL API:
-- **Endpoint**: `https://rickandmortyapi.com/graphql`
-- **Queries**: GetCharacters, GetCharacter
+- GraphQL documents are the source of truth for requested fields.
+- Generated files under `lib/data/graphql/__generated__/` provide strongly typed operations.
+- Data sources execute queries and throw exceptions.
+- Repositories catch those exceptions and convert them into domain-facing failures.
+- Mappers convert generated GraphQL classes into domain entities.
 
-### Example Query:
-```graphql
-query GetCharacters($page: Int!) {
-  characters(page: $page) {
-    results {
-      id
-      name
-      status
-      species
-      image
-    }
-  }
-}
-```
+The mapper layer is one of the better patterns in this repo. It keeps generated code from spreading into the rest of the app.
 
-## 📝 How to Extend
+### Core
 
-### Adding a New Feature:
+Core lives in `lib/core/`.
 
-1. **Create Entity** in `domain/entities/`
-2. **Create Repository Interface** in `domain/repositories/`
-3. **Create Use Case** in `domain/usecases/`
-4. **Create Model** in `data/models/`
-5. **Create Data Source** in `data/datasources/`
-6. **Implement Repository** in `data/repositories/`
-7. **Create BLoC** in `presentation/bloc/`
-8. **Create UI** in `presentation/pages/` and `presentation/widgets/`
-9. **Run build_runner** to generate code
-10. **Register dependencies** will be auto-generated by injectable
+- `config/` contains endpoint and theme setup.
+- `di/` contains `get_it` and `injectable` wiring.
+- `error/` defines shared exceptions and failures.
+- `navigation/` centralizes route names, route argument types, and navigation helpers.
+- `network/` owns GraphQL client construction.
+- `usecase/` defines the base use case contract.
 
-## 🧪 Testing
+## End-to-End Flow
 
-The architecture makes it easy to write tests for each layer:
+The character list flow is the easiest slice to study.
 
-- **Unit Tests**: Test use cases and repositories
-- **Widget Tests**: Test UI components
-- **Integration Tests**: Test complete features
+1. `CharacterListPage` resolves `CharacterBloc` from DI and dispatches `GetCharactersEvent(page: 1)`.
+2. `CharacterBloc` calls `GetCharacters`.
+3. `GetCharacters` calls the `CharacterRepository` contract.
+4. `CharacterRepositoryImpl` delegates to `CharacterRemoteDataSource`.
+5. `CharacterRemoteDataSourceImpl` executes the generated `query$GetCharacters` operation.
+6. `character_mapper.dart` converts generated result objects into `Character` entities.
+7. `CharacterRepositoryImpl` returns `Right(List<Character>)` on success or maps exceptions into `Left(Failure)`.
+8. `CharacterBloc` emits `CharactersLoaded` or `CharacterError`.
+9. `CharacterListWidget` renders the next UI state.
 
-## 🔐 Environment Configuration
+That flow is the core reason this repository works well as a role model. Each step has one job and the dependencies are predictable.
 
-To use your own GraphQL endpoint:
-1. Open `lib/core/network/graphql_client.dart`
-2. Update the `HttpLink` URL
-3. Configure authentication if needed
+## Why The Current Structure Works
 
-## 📚 Resources
+- The app shell is tiny. `main.dart` only initializes DI and boots `MyApp`.
+- Routing is centralized. Pages do not hardcode route names across the codebase.
+- Generated code stays in the data layer.
+- Exceptions are translated once, at the repository boundary.
+- Shared app concerns are not buried inside a specific feature.
 
-- [Clean Architecture by Uncle Bob](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
-- [Flutter BLoC Documentation](https://bloclibrary.dev/)
-- [GraphQL Flutter Documentation](https://github.com/zino-hofmann/graphql-flutter)
-- [Rick and Morty API](https://rickandmortyapi.com/documentation)
+## GraphQL And Code Generation Model
 
-## 🤝 Contributing
+There are three separate artifacts to keep straight:
 
-Feel free to contribute to this project by:
-1. Forking the repository
-2. Creating a feature branch
-3. Making your changes
-4. Submitting a pull request
+1. `lib/data/graphql/*.graphql`
+These are the handwritten operation documents.
 
-## 📄 License
+2. `lib/data/graphql/__generated__/*.dart`
+These are generated Dart operation models and client helpers.
 
-This project is open-source and available under the MIT License.
+3. `lib/data/graphql/schema.graphql`
+This is a checked-in SDL snapshot of the backend schema.
+
+In daily Flutter development, the files that matter most are the handwritten operation documents and the generated Dart files. The local schema snapshot is useful documentation and a good way to keep the repo aligned with backend changes, but the architecture boundary still sits at the mapper and repository layers.
+
+## What To Reuse In A Real Project
+
+These parts are strong candidates to keep:
+
+- The folder split between `presentation`, `domain`, `data`, and `core`
+- Repository interfaces in domain and implementations in data
+- Mapper extensions for converting generated transport types into domain entities
+- Type-safe route argument classes and route helper extensions
+- A single DI entry point
+- Failure-based repository results with `Either`
+
+These parts should be treated as sample-only and adapted:
+
+- Hardcoded sample counts on the dashboard
+- Placeholder favorites and settings actions
+- Search implemented only as client-side filtering over the first loaded page
+- A single remote-only data source strategy with no caching or persistence
+- Minimal test coverage focused on one slice
+
+## If You Turn This Into A Production Template
+
+Raise the bar in these areas first:
+
+- Replace `AppEndpoint` with environment-specific endpoints for dev, staging, and prod.
+- Add auth token handling rules per environment.
+- Add pagination strategy beyond the first page.
+- Decide whether you need caching, offline support, or local persistence.
+- Add BLoC tests and integration tests, not just repository and use case tests.
+- Add feature-level folders if the app grows beyond a few slices.
+
+## Reading Order For New Developers
+
+If someone joins the project and needs to understand it quickly, point them here:
+
+1. `README.md` for the project shape and setup commands.
+2. `lib/core/navigation/app_router.dart` to see the app surface.
+3. `lib/presentation/bloc/character_bloc.dart` for the presentation-to-domain handoff.
+4. `lib/domain/usecases/get_characters.dart` and `lib/domain/repositories/character_repository.dart` for the domain contract.
+5. `lib/data/datasources/character_remote_data_source.dart`, `lib/data/repositories/character_repository_impl.dart`, and `lib/data/mappers/character_mapper.dart` for the data path.
+6. `DEVELOPER_GUIDE.md` for the day-to-day workflow.
+
+If those files make sense, the rest of the codebase follows the same pattern.

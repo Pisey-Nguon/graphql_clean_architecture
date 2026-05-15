@@ -1,192 +1,44 @@
 # Developer Guide
 
-This guide is for engineers who need to extend this sample or use it as a template for another GraphQL + Clean Architecture Flutter project.
+This guide is for day-to-day work in the repository: setup, code generation, feature development, and schema refresh.
 
-## 1. First-Time Setup
+## Prerequisites
+
+- Flutter 3.10 or newer
+- Dart 3.10 or newer
+- Xcode or Android Studio for device builds
+- Node.js and npm only if you want to refresh the checked-in `schema.graphql` snapshot from the command line
+
+## First-Time Setup
 
 ```bash
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
-flutter analyze
-flutter test
 flutter run
 ```
 
-If you change injectable annotations, GraphQL documents, or serializable models, run build runner again.
-
-## 2. The Responsibility Of Each Layer
-
-### `app/`
-
-- Owns the root `MaterialApp`
-- Pulls together theme and route generation
-- Should not contain feature logic
-
-### `presentation/`
-
-- Pages, widgets, and BLoCs
-- Converts user actions into events
-- Renders loading, success, empty, and error states
-- Can depend on domain and core
-
-### `domain/`
-
-- Entities
-- Repository interfaces
-- Use cases
-- Must remain pure Dart
-
-### `data/`
-
-- GraphQL documents and generated operation classes
-- Data models
-- Remote data sources
-- Repository implementations
-- Can depend on domain and core
-
-### `core/`
-
-- Cross-cutting concerns used by multiple features
-- DI, network, theme config, routes, failures, exceptions, base abstractions
-
-## 3. The Standard Feature Shape
-
-Every new feature should follow the same sequence:
-
-```text
-presentation -> domain -> data -> remote GraphQL
-```
-
-Recommended file checklist:
-
-```text
-domain/entities/<feature>.dart
-domain/repositories/<feature>_repository.dart
-domain/usecases/get_<feature>.dart
-data/graphql/get_<feature>.graphql.dart
-data/graphql/__generated__/get_<feature>.graphql.dart   # generated
-data/models/<feature>_model.dart
-data/datasources/<feature>_remote_data_source.dart
-data/repositories/<feature>_repository_impl.dart
-presentation/bloc/<feature>_bloc.dart
-presentation/pages/<feature>_page.dart
-presentation/widgets/<feature>_*.dart
-```
-
-If a screen only reuses an existing feature, you do not need the whole stack. Add only the presentation pieces and route registration.
-
-## 4. Adding A New Screen
-
-Use this workflow for a new page that uses already-existing repositories and use cases.
-
-1. Create the page in `presentation/pages/`.
-2. If the page needs local reusable UI, extract it to `presentation/widgets/`.
-3. If the page needs event/state coordination, reuse or extend the feature BLoC.
-4. Register the page in `lib/core/navigation/app_router.dart`.
-5. Navigate with named routes and typed route arguments.
-6. Keep the route entrypoint small. Heavy logic belongs in BLoC or use case code.
-
-Questions to ask before creating a new BLoC:
-
-- Is the state lifecycle different from the existing page?
-- Will the screen fetch a different use case or combine multiple use cases?
-- Is the state reusable elsewhere?
-
-If the answer is mostly no, prefer reusing the existing BLoC or a smaller widget-level state object.
-
-## 5. Adding A New Feature End To End
-
-### Step 1: Define The Domain
-
-Create the entity, repository contract, and use cases first.
-
-Rules:
-
-- Entities should not import Flutter.
-- Repository contracts return `Either<Failure, T>`.
-- Use cases should be very small orchestration units.
-
-### Step 2: Add GraphQL Documents
-
-Create a GraphQL document in `lib/data/graphql/`.
-
-Example shape:
-
-```graphql
-query GetResidents($page: Int!) {
-  residents(page: $page) {
-    results {
-      id
-      name
-    }
-  }
-}
-```
-
-Then run:
+Recommended validation commands:
 
 ```bash
+flutter analyze
+flutter test
+dart format lib test
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-### Step 3: Build The Data Layer
+Prefer `dart run build_runner ...` over `flutter pub run build_runner ...`.
 
-1. Map the generated GraphQL response into a handwritten model.
-2. Keep parsing and API details inside the data source.
-3. Translate exceptions into failures in the repository implementation.
+## Daily Workflow
 
-Repository rule of thumb:
+### When you change GraphQL documents
 
-- Data source throws `ServerException`, `NetworkException`, or another explicit exception.
-- Repository catches those exceptions and returns the corresponding `Failure`.
+If you edit any file in `lib/data/graphql/*.graphql`:
 
-### Step 4: Build The Presentation Layer
-
-1. Add BLoC events and states for the feature flow.
-2. Dispatch the initial event from the page entrypoint.
-3. Handle loading, success, and error states in the page.
-4. Extract repeatable UI into widgets.
-
-### Step 5: Integrate The Feature
-
-1. Register DI annotations if a new data source, repository, use case, or BLoC was added.
-2. Re-run build runner.
-3. Register the route in `app_router.dart`.
-4. Add a navigation entry from the dashboard or another relevant screen.
-
-## 6. Routing Rules
-
-- Top-level routes and detail routes are defined in `lib/core/navigation/app_router.dart`.
-- Use typed argument classes for detail pages instead of passing raw maps.
-- Prefer `pushNamed` over inline `MaterialPageRoute` when a route already exists.
-- Keep route generation declarative and side-effect free.
-
-## 7. Theme Rules
-
-- Shared theme decisions belong in `lib/core/config/app_theme.dart`.
-- Feature pages can still use local accent colors when the page identity benefits from it.
-- Do not recreate app-wide typography or snack bar policy in leaf pages.
-
-## 8. GraphQL Rules
-
-- Generated GraphQL classes stay in the data layer.
-- The domain layer should never import generated GraphQL files.
-- This sample does not require auth.
-- If a downstream project needs auth, pass `GRAPHQL_AUTH_TOKEN` with `--dart-define` instead of hardcoding it.
-
-Example:
-
-```bash
-flutter run --dart-define=GRAPHQL_AUTH_TOKEN=<token>
-```
-
-## 9. Regeneration Triggers
-
-Run build runner when any of these change:
-
-- `@injectable`, `@LazySingleton`, or other injectable annotations
-- GraphQL operation documents
-- json serializable models
+1. Update the operation fields or variables.
+2. Run code generation.
+3. Update the mapper if the returned shape changed.
+4. Update the data source or repository if the behavior changed.
+5. Run `flutter analyze` and the relevant tests.
 
 Command:
 
@@ -194,37 +46,103 @@ Command:
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-## 10. Common Development Commands
+### When you change DI annotations
+
+If you add or change `@injectable`, `@lazySingleton`, or related DI wiring, rerun build runner so `injection_container.config.dart` stays in sync.
+
+### When you add or change entities, repositories, or use cases
+
+No generator is required for plain domain changes unless those changes also touch DI or JSON serialization.
+
+## Feature Development Workflow
+
+For a new backend-backed feature, follow this order:
+
+1. Add or extend domain entities in `lib/domain/entities/`.
+2. Define the repository contract in `lib/domain/repositories/`.
+3. Add use cases in `lib/domain/usecases/`.
+4. Create the GraphQL operation in `lib/data/graphql/`.
+5. Run build runner.
+6. Add mapper extensions in `lib/data/mappers/`.
+7. Implement the remote data source in `lib/data/datasources/`.
+8. Implement the repository in `lib/data/repositories/`.
+9. Add the BLoC, page, and widgets in `lib/presentation/`.
+10. Register routes and route args in `lib/core/navigation/app_router.dart`.
+11. Run formatter, analyzer, and tests.
+
+For a UI-only screen that reuses existing domain data, you usually only need the presentation layer plus route registration.
+
+## GraphQL File Ownership
+
+Edit these files:
+
+- `lib/data/graphql/*.graphql`
+- `lib/data/datasources/*.dart`
+- `lib/data/mappers/*.dart`
+- `lib/data/repositories/*.dart`
+
+Do not edit these files by hand:
+
+- `lib/data/graphql/__generated__/*.dart`
+- `lib/core/di/injection_container.config.dart`
+- `*.g.dart`
+
+## How To Refresh `schema.graphql`
+
+Use this when the backend schema changes and you want to update the checked-in schema snapshot inside the project.
+
+### Public endpoint
 
 ```bash
-dart format lib test
-flutter analyze
-flutter test
-flutter clean
-flutter pub get
+npx --yes @graphql-inspector/cli introspect https://rickandmortyapi.com/graphql --write lib/data/graphql/schema.graphql
+dart run build_runner build --delete-conflicting-outputs
 ```
 
-## 11. Review Checklist For New Work
+### Authenticated endpoint
 
-Before merging, verify all of the following:
+```bash
+npx --yes @graphql-inspector/cli introspect https://your-backend/graphql \
+  -h "Authorization: Bearer <token>" \
+  --write lib/data/graphql/schema.graphql
+dart run build_runner build --delete-conflicting-outputs
+```
 
-- Layer dependencies still flow inward.
-- No generated file was edited manually.
-- New routes are registered in one place.
-- New repositories return `Either<Failure, T>`.
-- New pages handle loading and error states.
-- Analyzer and tests pass.
-- README or guide docs were updated if the workflow changed.
+Notes:
 
-## 12. When To Create Shared Code
+- The schema file is an SDL snapshot committed to the repo.
+- Build runner should be rerun after a schema refresh so generated operations stay aligned with the backend contract.
+- If the backend adds breaking schema changes, expect mapper, data source, or operation-document updates before code generation succeeds cleanly.
 
-Promote something to `core/` only if it is genuinely cross-cutting.
+## Runtime Configuration
 
-Good candidates:
+The project supports endpoint flavor selection and optional GraphQL auth:
 
-- Shared route registration
-- Theme setup
-- Error abstractions
-- Common network services
+```bash
+flutter run --dart-define=FLAVOR=dev
+flutter run --dart-define=GRAPHQL_AUTH_TOKEN=<token>
+flutter run --dart-define=FLAVOR=prod --dart-define=GRAPHQL_AUTH_TOKEN=<token>
+```
 
-Keep feature-specific layout, display formatting, and one-off widgets inside `presentation/` unless there is proven reuse.
+Right now both `dev` and `prod` point to the same Rick and Morty endpoint. In a real project, replace those constants in `lib/core/config/app_endpoint.dart`.
+
+## Troubleshooting
+
+### Build runner says everything is skipped
+
+That is normal when nothing changed.
+
+### GraphQL generated types do not match your mapper
+
+The usual causes are:
+
+- The `.graphql` document changed and build runner was not rerun.
+- The backend schema changed and the local snapshot was not refreshed.
+- The mapper still assumes fields that are no longer selected in the operation.
+
+### The app compiles but detail pages refetch unnecessarily
+
+Check route arguments first. `CharacterDetailRouteArgs` supports an optional preloaded `Character`, which avoids a second request when navigating from a list item.
+
+### You are unsure where to start reading the codebase
+
+Start from the character slice. It is the clearest example of the intended architecture and has the most complete test coverage in the repository.

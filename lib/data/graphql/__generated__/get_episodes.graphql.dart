@@ -626,10 +626,10 @@ class _CopyWithStubImpl$Query$GetEpisodes$episodes<TRes>
 
 class Query$GetEpisodes$episodes$results {
   Query$GetEpisodes$episodes$results({
-    required this.id,
-    required this.name,
-    required this.air_date,
-    required this.episode,
+    this.id,
+    this.name,
+    this.air_date,
+    this.episode,
     this.$__typename = 'Episode',
   });
 
@@ -642,21 +642,21 @@ class Query$GetEpisodes$episodes$results {
     final l$episode = json['episode'];
     final l$$__typename = json['__typename'];
     return Query$GetEpisodes$episodes$results(
-      id: (l$id as String),
-      name: (l$name as String),
-      air_date: (l$air_date as String),
-      episode: (l$episode as String),
+      id: (l$id as String?),
+      name: (l$name as String?),
+      air_date: (l$air_date as String?),
+      episode: (l$episode as String?),
       $__typename: (l$$__typename as String),
     );
   }
 
-  final String id;
+  final String? id;
 
-  final String name;
+  final String? name;
 
-  final String air_date;
+  final String? air_date;
 
-  final String episode;
+  final String? episode;
 
   final String $__typename;
 
@@ -767,16 +767,12 @@ class _CopyWithImpl$Query$GetEpisodes$episodes$results<TRes>
     Object? $__typename = _undefined,
   }) => _then(
     Query$GetEpisodes$episodes$results(
-      id: id == _undefined || id == null ? _instance.id : (id as String),
-      name: name == _undefined || name == null
-          ? _instance.name
-          : (name as String),
-      air_date: air_date == _undefined || air_date == null
+      id: id == _undefined ? _instance.id : (id as String?),
+      name: name == _undefined ? _instance.name : (name as String?),
+      air_date: air_date == _undefined
           ? _instance.air_date
-          : (air_date as String),
-      episode: episode == _undefined || episode == null
-          ? _instance.episode
-          : (episode as String),
+          : (air_date as String?),
+      episode: episode == _undefined ? _instance.episode : (episode as String?),
       $__typename: $__typename == _undefined || $__typename == null
           ? _instance.$__typename
           : ($__typename as String),

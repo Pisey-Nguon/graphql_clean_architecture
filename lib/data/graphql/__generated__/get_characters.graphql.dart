@@ -637,11 +637,11 @@ class _CopyWithStubImpl$Query$GetCharacters$characters<TRes>
 
 class Query$GetCharacters$characters$results {
   Query$GetCharacters$characters$results({
-    required this.id,
-    required this.name,
-    required this.status,
-    required this.species,
-    required this.image,
+    this.id,
+    this.name,
+    this.status,
+    this.species,
+    this.image,
     this.$__typename = 'Character',
   });
 
@@ -655,24 +655,24 @@ class Query$GetCharacters$characters$results {
     final l$image = json['image'];
     final l$$__typename = json['__typename'];
     return Query$GetCharacters$characters$results(
-      id: (l$id as String),
-      name: (l$name as String),
-      status: (l$status as String),
-      species: (l$species as String),
-      image: (l$image as String),
+      id: (l$id as String?),
+      name: (l$name as String?),
+      status: (l$status as String?),
+      species: (l$species as String?),
+      image: (l$image as String?),
       $__typename: (l$$__typename as String),
     );
   }
 
-  final String id;
+  final String? id;
 
-  final String name;
+  final String? name;
 
-  final String status;
+  final String? status;
 
-  final String species;
+  final String? species;
 
-  final String image;
+  final String? image;
 
   final String $__typename;
 
@@ -804,19 +804,11 @@ class _CopyWithImpl$Query$GetCharacters$characters$results<TRes>
     Object? $__typename = _undefined,
   }) => _then(
     Query$GetCharacters$characters$results(
-      id: id == _undefined || id == null ? _instance.id : (id as String),
-      name: name == _undefined || name == null
-          ? _instance.name
-          : (name as String),
-      status: status == _undefined || status == null
-          ? _instance.status
-          : (status as String),
-      species: species == _undefined || species == null
-          ? _instance.species
-          : (species as String),
-      image: image == _undefined || image == null
-          ? _instance.image
-          : (image as String),
+      id: id == _undefined ? _instance.id : (id as String?),
+      name: name == _undefined ? _instance.name : (name as String?),
+      status: status == _undefined ? _instance.status : (status as String?),
+      species: species == _undefined ? _instance.species : (species as String?),
+      image: image == _undefined ? _instance.image : (image as String?),
       $__typename: $__typename == _undefined || $__typename == null
           ? _instance.$__typename
           : ($__typename as String),

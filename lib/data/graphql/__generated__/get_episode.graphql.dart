@@ -479,11 +479,11 @@ class Query$GetEpisode$Widget extends graphql_flutter.Query<Query$GetEpisode> {
 
 class Query$GetEpisode$episode {
   Query$GetEpisode$episode({
-    required this.id,
-    required this.name,
-    required this.air_date,
-    required this.episode,
-    this.characters,
+    this.id,
+    this.name,
+    this.air_date,
+    this.episode,
+    required this.characters,
     this.$__typename = 'Episode',
   });
 
@@ -495,12 +495,12 @@ class Query$GetEpisode$episode {
     final l$characters = json['characters'];
     final l$$__typename = json['__typename'];
     return Query$GetEpisode$episode(
-      id: (l$id as String),
-      name: (l$name as String),
-      air_date: (l$air_date as String),
-      episode: (l$episode as String),
-      characters: (l$characters as List<dynamic>?)
-          ?.map(
+      id: (l$id as String?),
+      name: (l$name as String?),
+      air_date: (l$air_date as String?),
+      episode: (l$episode as String?),
+      characters: (l$characters as List<dynamic>)
+          .map(
             (e) => e == null
                 ? null
                 : Query$GetEpisode$episode$characters.fromJson(
@@ -512,15 +512,15 @@ class Query$GetEpisode$episode {
     );
   }
 
-  final String id;
+  final String? id;
 
-  final String name;
+  final String? name;
 
-  final String air_date;
+  final String? air_date;
 
-  final String episode;
+  final String? episode;
 
-  final List<Query$GetEpisode$episode$characters?>? characters;
+  final List<Query$GetEpisode$episode$characters?> characters;
 
   final String $__typename;
 
@@ -535,7 +535,7 @@ class Query$GetEpisode$episode {
     final l$episode = episode;
     _resultData['episode'] = l$episode;
     final l$characters = characters;
-    _resultData['characters'] = l$characters?.map((e) => e?.toJson()).toList();
+    _resultData['characters'] = l$characters.map((e) => e?.toJson()).toList();
     final l$$__typename = $__typename;
     _resultData['__typename'] = l$$__typename;
     return _resultData;
@@ -554,7 +554,7 @@ class Query$GetEpisode$episode {
       l$name,
       l$air_date,
       l$episode,
-      l$characters == null ? null : Object.hashAll(l$characters.map((v) => v)),
+      Object.hashAll(l$characters.map((v) => v)),
       l$$__typename,
     ]);
   }
@@ -590,19 +590,15 @@ class Query$GetEpisode$episode {
     }
     final l$characters = characters;
     final lOther$characters = other.characters;
-    if (l$characters != null && lOther$characters != null) {
-      if (l$characters.length != lOther$characters.length) {
+    if (l$characters.length != lOther$characters.length) {
+      return false;
+    }
+    for (int i = 0; i < l$characters.length; i++) {
+      final l$characters$entry = l$characters[i];
+      final lOther$characters$entry = lOther$characters[i];
+      if (l$characters$entry != lOther$characters$entry) {
         return false;
       }
-      for (int i = 0; i < l$characters.length; i++) {
-        final l$characters$entry = l$characters[i];
-        final lOther$characters$entry = lOther$characters[i];
-        if (l$characters$entry != lOther$characters$entry) {
-          return false;
-        }
-      }
-    } else if (l$characters != lOther$characters) {
-      return false;
     }
     final l$$__typename = $__typename;
     final lOther$$__typename = other.$__typename;
@@ -637,12 +633,12 @@ abstract class CopyWith$Query$GetEpisode$episode<TRes> {
     String? $__typename,
   });
   TRes characters(
-    Iterable<Query$GetEpisode$episode$characters?>? Function(
+    Iterable<Query$GetEpisode$episode$characters?> Function(
       Iterable<
         CopyWith$Query$GetEpisode$episode$characters<
           Query$GetEpisode$episode$characters
         >?
-      >?,
+      >,
     )
     _fn,
   );
@@ -667,19 +663,15 @@ class _CopyWithImpl$Query$GetEpisode$episode<TRes>
     Object? $__typename = _undefined,
   }) => _then(
     Query$GetEpisode$episode(
-      id: id == _undefined || id == null ? _instance.id : (id as String),
-      name: name == _undefined || name == null
-          ? _instance.name
-          : (name as String),
-      air_date: air_date == _undefined || air_date == null
+      id: id == _undefined ? _instance.id : (id as String?),
+      name: name == _undefined ? _instance.name : (name as String?),
+      air_date: air_date == _undefined
           ? _instance.air_date
-          : (air_date as String),
-      episode: episode == _undefined || episode == null
-          ? _instance.episode
-          : (episode as String),
-      characters: characters == _undefined
+          : (air_date as String?),
+      episode: episode == _undefined ? _instance.episode : (episode as String?),
+      characters: characters == _undefined || characters == null
           ? _instance.characters
-          : (characters as List<Query$GetEpisode$episode$characters?>?),
+          : (characters as List<Query$GetEpisode$episode$characters?>),
       $__typename: $__typename == _undefined || $__typename == null
           ? _instance.$__typename
           : ($__typename as String),
@@ -687,22 +679,22 @@ class _CopyWithImpl$Query$GetEpisode$episode<TRes>
   );
 
   TRes characters(
-    Iterable<Query$GetEpisode$episode$characters?>? Function(
+    Iterable<Query$GetEpisode$episode$characters?> Function(
       Iterable<
         CopyWith$Query$GetEpisode$episode$characters<
           Query$GetEpisode$episode$characters
         >?
-      >?,
+      >,
     )
     _fn,
   ) => call(
     characters: _fn(
-      _instance.characters?.map(
+      _instance.characters.map(
         (e) => e == null
             ? null
             : CopyWith$Query$GetEpisode$episode$characters(e, (i) => i),
       ),
-    )?.toList(),
+    ).toList(),
   );
 }
 
@@ -726,9 +718,9 @@ class _CopyWithStubImpl$Query$GetEpisode$episode<TRes>
 
 class Query$GetEpisode$episode$characters {
   Query$GetEpisode$episode$characters({
-    required this.id,
-    required this.name,
-    required this.image,
+    this.id,
+    this.name,
+    this.image,
     this.$__typename = 'Character',
   });
 
@@ -740,18 +732,18 @@ class Query$GetEpisode$episode$characters {
     final l$image = json['image'];
     final l$$__typename = json['__typename'];
     return Query$GetEpisode$episode$characters(
-      id: (l$id as String),
-      name: (l$name as String),
-      image: (l$image as String),
+      id: (l$id as String?),
+      name: (l$name as String?),
+      image: (l$image as String?),
       $__typename: (l$$__typename as String),
     );
   }
 
-  final String id;
+  final String? id;
 
-  final String name;
+  final String? name;
 
-  final String image;
+  final String? image;
 
   final String $__typename;
 
@@ -847,13 +839,9 @@ class _CopyWithImpl$Query$GetEpisode$episode$characters<TRes>
     Object? $__typename = _undefined,
   }) => _then(
     Query$GetEpisode$episode$characters(
-      id: id == _undefined || id == null ? _instance.id : (id as String),
-      name: name == _undefined || name == null
-          ? _instance.name
-          : (name as String),
-      image: image == _undefined || image == null
-          ? _instance.image
-          : (image as String),
+      id: id == _undefined ? _instance.id : (id as String?),
+      name: name == _undefined ? _instance.name : (name as String?),
+      image: image == _undefined ? _instance.image : (image as String?),
       $__typename: $__typename == _undefined || $__typename == null
           ? _instance.$__typename
           : ($__typename as String),
