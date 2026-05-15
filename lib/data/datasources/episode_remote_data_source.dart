@@ -1,10 +1,9 @@
 import 'package:injectable/injectable.dart';
-import 'package:graphql/client.dart' as graphql;
 import '../../core/error/exceptions.dart';
 import '../../core/network/graphql_client.dart';
 import '../../domain/entities/episode.dart';
+import '../graphql/__generated__/get_episode.graphql.dart';
 import '../graphql/__generated__/get_episodes.graphql.dart';
-import '../graphql/get_episode.graphql.dart' as episode_query;
 import '../mappers/episode_mapper.dart';
 
 abstract class EpisodeRemoteDataSource {
@@ -48,16 +47,11 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
   @override
   Future<Episode> getEpisode({required String id}) async {
     try {
-      final result = await graphQLClient.client
-          .query<episode_query.Query$GetEpisode>(
-            graphql.QueryOptions(
-              document: episode_query.documentNodeQueryGetEpisode,
-              variables: episode_query.Variables$Query$GetEpisode(
-                id: id,
-              ).toJson(),
-              parserFn: episode_query.Query$GetEpisode.fromJson,
-            ),
-          );
+      final result = await graphQLClient.client.query$GetEpisode(
+        Options$Query$GetEpisode(
+          variables: Variables$Query$GetEpisode(id: id),
+        ),
+      );
 
       if (result.hasException) {
         throw ServerException(result.exception.toString());

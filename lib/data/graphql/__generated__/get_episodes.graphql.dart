@@ -1,6 +1,9 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
 import 'dart:async';
+import 'package:flutter/widgets.dart' as widgets;
 import 'package:gql/ast.dart';
 import 'package:graphql/client.dart' as graphql;
+import 'package:graphql_flutter/graphql_flutter.dart' as graphql_flutter;
 
 class Variables$Query$GetEpisodes {
   factory Variables$Query$GetEpisodes({required int page}) =>
@@ -439,6 +442,22 @@ extension ClientExtension$Query$GetEpisodes on graphql.GraphQLClient {
     );
     return result == null ? null : Query$GetEpisodes.fromJson(result);
   }
+}
+
+graphql_flutter.QueryHookResult<Query$GetEpisodes> useQuery$GetEpisodes(
+  Options$Query$GetEpisodes options,
+) => graphql_flutter.useQuery(options);
+graphql.ObservableQuery<Query$GetEpisodes> useWatchQuery$GetEpisodes(
+  WatchOptions$Query$GetEpisodes options,
+) => graphql_flutter.useWatchQuery(options);
+
+class Query$GetEpisodes$Widget
+    extends graphql_flutter.Query<Query$GetEpisodes> {
+  Query$GetEpisodes$Widget({
+    widgets.Key? key,
+    required Options$Query$GetEpisodes options,
+    required graphql_flutter.QueryBuilder<Query$GetEpisodes> builder,
+  }) : super(key: key, options: options, builder: builder);
 }
 
 class Query$GetEpisodes$episodes {

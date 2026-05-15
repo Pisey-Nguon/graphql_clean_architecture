@@ -1,0 +1,13 @@
+targets:
+  $default:
+    builders:
+      graphql_codegen:
+        options:
+          clients:
+            - graphql_flutter
+          assetsPath: lib/data/graphql/**.graphql
+          scopes:
+            - lib/data/graphql/**
+          outputDirectory: __generated__
+          generatedFileHeader: |
+            // GENERATED CODE - DO NOT MODIFY BY HAND

@@ -1,6 +1,9 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
 import 'dart:async';
+import 'package:flutter/widgets.dart' as widgets;
 import 'package:gql/ast.dart';
 import 'package:graphql/client.dart' as graphql;
+import 'package:graphql_flutter/graphql_flutter.dart' as graphql_flutter;
 
 class Variables$Query$GetLocations {
   factory Variables$Query$GetLocations({required int page}) =>
@@ -439,6 +442,22 @@ extension ClientExtension$Query$GetLocations on graphql.GraphQLClient {
     );
     return result == null ? null : Query$GetLocations.fromJson(result);
   }
+}
+
+graphql_flutter.QueryHookResult<Query$GetLocations> useQuery$GetLocations(
+  Options$Query$GetLocations options,
+) => graphql_flutter.useQuery(options);
+graphql.ObservableQuery<Query$GetLocations> useWatchQuery$GetLocations(
+  WatchOptions$Query$GetLocations options,
+) => graphql_flutter.useWatchQuery(options);
+
+class Query$GetLocations$Widget
+    extends graphql_flutter.Query<Query$GetLocations> {
+  Query$GetLocations$Widget({
+    widgets.Key? key,
+    required Options$Query$GetLocations options,
+    required graphql_flutter.QueryBuilder<Query$GetLocations> builder,
+  }) : super(key: key, options: options, builder: builder);
 }
 
 class Query$GetLocations$locations {

@@ -1,5 +1,5 @@
 import '../../domain/entities/episode.dart';
-import '../graphql/get_episode.graphql.dart';
+import '../graphql/__generated__/get_episode.graphql.dart';
 import '../graphql/__generated__/get_episodes.graphql.dart';
 
 extension GetEpisodeMapper on Query$GetEpisode$episode {

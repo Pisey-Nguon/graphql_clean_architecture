@@ -1,6 +1,9 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
 import 'dart:async';
+import 'package:flutter/widgets.dart' as widgets;
 import 'package:gql/ast.dart';
 import 'package:graphql/client.dart' as graphql;
+import 'package:graphql_flutter/graphql_flutter.dart' as graphql_flutter;
 
 class Variables$Query$GetCharacter {
   factory Variables$Query$GetCharacter({required String id}) =>
@@ -429,6 +432,22 @@ extension ClientExtension$Query$GetCharacter on graphql.GraphQLClient {
     );
     return result == null ? null : Query$GetCharacter.fromJson(result);
   }
+}
+
+graphql_flutter.QueryHookResult<Query$GetCharacter> useQuery$GetCharacter(
+  Options$Query$GetCharacter options,
+) => graphql_flutter.useQuery(options);
+graphql.ObservableQuery<Query$GetCharacter> useWatchQuery$GetCharacter(
+  WatchOptions$Query$GetCharacter options,
+) => graphql_flutter.useWatchQuery(options);
+
+class Query$GetCharacter$Widget
+    extends graphql_flutter.Query<Query$GetCharacter> {
+  Query$GetCharacter$Widget({
+    widgets.Key? key,
+    required Options$Query$GetCharacter options,
+    required graphql_flutter.QueryBuilder<Query$GetCharacter> builder,
+  }) : super(key: key, options: options, builder: builder);
 }
 
 class Query$GetCharacter$character {

@@ -1,3 +1,4 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
 enum Enum$__TypeKind {
   SCALAR,
   OBJECT,
